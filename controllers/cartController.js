@@ -144,13 +144,11 @@ const loadCartPage = async (req, res) => {
       res.json({ success: false, error: "Internal server error" });
     }
   };
+  
+
  
-
-
-
-
-    
-  const removeFromCart = async (req, res) => {
+  
+   const removeFromCart = async (req, res) => {
     try {
       const userId = req.session.user_id;
       const productId = req.query.productId;

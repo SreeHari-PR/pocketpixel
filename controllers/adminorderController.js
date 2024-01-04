@@ -5,6 +5,7 @@ const User = require("../models/user");
 const Cart = require("../models/cartModel");
 
 const Product = require("../models/productModel");
+const dateFun=require("../config/dateData");
 
 
 
@@ -46,7 +47,6 @@ const listOrderDetails=async(req,res)=>{
           path: "items.product",
           model: "Product",
         })
-   console.log(order,"order");
    let orderData=order
     res.render("admin/orderDetails", { order:orderData });
       } catch (error) {
@@ -61,11 +61,6 @@ const orderStatusChange = async (req, res) => {
     const orderId = req.query.id;
     const {status,productId}=req.body
    
-
-
-
- 
-console.log(req.body,"req.body");
     const order = await Order.findOne({ _id: orderId })
       .populate("user")
       .populate({
@@ -76,8 +71,6 @@ console.log(req.body,"req.body");
         path: "items.product",
         model: "Product",
       });
-
-console.log(order,"orderorder");
 
 
 
@@ -113,10 +106,68 @@ const updateData = await Order.findByIdAndUpdate(
 
   }
 }; 
+const loadSalesReport = async (req, res) => {
+  let query = {};
+
+  
+        if (req.query.status) {
+          if (req.query.status === "Daily") {
+            query.orderDate = dateFun.getDailyDateRange();
+          } else if (req.query.status === "Weekly") {
+            query.orderDate = dateFun.getWeeklyDateRange();
+          }else if (req.query.status === "Monthly") {
+            query.orderDate = dateFun.getMonthlyDateRange();
+          } 
+          
+          else if (req.query.status === "Yearly") {
+            query.orderDate = dateFun.getYearlyDateRange();
+          }
+          else if (req.query.status === "All") {
+            query["items.status"] = "Delivered";
+          }
+        }
+  query["items.status"] = "Delivered";
+
+  try {
+    const orders = await Order.find(query).sort({ orderDate: -1 } )
+      .populate("user")
+      .populate({
+        path: "address",
+        model: "Address",
+      })
+      .populate({
+        path: "items.product",
+        model: "Product",
+      })
+      .sort({ orderDate: -1 });
+
+    // Calculate total revenue
+    const totalRevenue = orders.reduce((acc, order) => acc + order.totalAmount, 0);
+
+    // Calculate total sales count
+    const totalSales = orders.length;
+
+    // Calculate total products sold
+    const totalProductsSold = orders.reduce((acc, order) => acc + order.items.length, 0);
+
+    res.render("admin/salesReport", {
+      orders,
+      totalRevenue,
+      totalSales,
+      totalProductsSold,
+      req,
+    });
+  } catch (err) {
+    console.error("Error fetching orders:", err);
+    // Handle error - send an error response or render an error page
+    res.status(500).send("Error fetching orders");
+  }
+};
 
   
   module.exports={
     listUserOrders,
     listOrderDetails,
     orderStatusChange,
+    loadSalesReport,
   }

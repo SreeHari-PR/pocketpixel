@@ -9,7 +9,7 @@ const isLogin = async (req, res, next) => {
     if (req.session.admin_id && adminData.isAdmin == 1 ) {
       next();
     } else {
-      res.render("/admin");
+      res.redirect("/admin"); 
     }
   } catch (error) {
     console.log(error.message);
@@ -23,7 +23,7 @@ const isLogout = async (req, res, next) => {
 
   
     if (req.session.admin_id && adminData.isAdmin == 1) {
-      res.render("/adminHome");
+      res.redirect("/admin/adminHome");
     } else {
       next();
     }

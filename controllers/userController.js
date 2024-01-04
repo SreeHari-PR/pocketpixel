@@ -3,6 +3,7 @@ const bcrypt = require('bcrypt');
 const message = require("../config/mailer");
 const Product=require("../models/productModel")
 const Category=require("../models/categoryModel");
+const Wallet=require("../models/walletModel")
 
 
 
@@ -258,26 +259,35 @@ const loadprofile = async (req, res) => {
 };
 const userEdit = async (req, res) => {
   try {
-    let id = req.body.user_id;
+    const id = req.body.user_id;
+
+    if (!id) {
+      return res.status(400).json({ success: false, message: 'User ID is missing or invalid' });
+    }
 
     const userData = await User.findById(id);
 
+    if (!userData) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+
     const { name, mobile } = req.body;
 
-    if(!req.file){
-      const updateData = await User.findByIdAndUpdate(
+    let updateData;
+
+    if (!req.file) {
+      updateData = await User.findByIdAndUpdate(
         { _id: id },
         {
           $set: {
             name,
             mobile,
-       
           },
-        }
+        },
+        { new: true } 
       );
-    }
-    else{
-      const updateData = await User.findByIdAndUpdate(
+    } else {
+      updateData = await User.findByIdAndUpdate(
         { _id: id },
         {
           $set: {
@@ -285,17 +295,19 @@ const userEdit = async (req, res) => {
             mobile,
             image: req.file.filename,
           },
-        }
+        },
+        { new: true }
       );
     }
 
-  
-
-    res.redirect("/userprofile");
+    res.status(200).json({ success: true, message: 'Profile updated successfully', user: updateData });
   } catch (error) {
-    console.log(error.message);
+    console.error(error.message);
+    res.status(500).json({ success: false, message: 'Internal server error' });
   }
 };
+
+
 
 const resetPassword = async (req, res) => {
   try {
@@ -449,6 +461,30 @@ const filterProducts = async (req, res) => {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 };
+const loadWallets = async (req, res) => {
+  try {
+    const userId = req.session.user_id;
+
+    const userData = await User.findById(userId);
+    if (!userData) {
+      return res.render("user/login", { userData: null });
+    }
+
+    const walletData = await Wallet.findOne({ user: userId });
+  
+    if (!walletData) {
+   console.log(walletData,"walletDataada");
+      return res.render("user/wallets", { userData, wallet: [] });
+    }
+    console.log(walletData,"walletData");
+
+    res.render("user/wallets", { userData, wallet: walletData });
+  } catch (err) {   
+  
+    console.error("Error in loadWallets route:", err);
+    res.status(500).send("Internal Server Error");
+  }
+};
 
 
 
@@ -489,6 +525,7 @@ resetPassword,
 laodForgetpassword,
 forgotPasswordOTP,
 loadResetPassword,
+loadWallets,
 
 
  }

@@ -16,29 +16,22 @@ const orderSchema = new mongoose.Schema({
   deliveryDate: {
     type: Date,
   },
+  coupon: {
+    type:String,
+  
+},
   shipping:{
     type:String,
     default:'Free Shipping'
 },
-  status: {
-    type: String,
-    default: 'pending',
-  },
-  reason:{
-    type:String
-  },
+
+ 
   totalAmount :{
     type:Number,
     require:true,
   },
-  paymentMethod: {
-    type:String,
-    require:true,
-  },
-  paymentStatus:{
-    type:String,
-    default:'Pending'
-  },
+
+
   items: [
     {
       product: {

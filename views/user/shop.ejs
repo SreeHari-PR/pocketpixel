@@ -70,13 +70,19 @@
                         <!-- Product Details -->
                         <div class="product-content-wrap">
                           <div class="product-category">
-                            <a href="shop-grid-right.html">Music</a>
+                            <a href="shopCategoryFilter?id=<%= category._id %>">
+                              <option value="<%= category._id %>"><%= category.name %></option>
+                            </a>
                           </div>
                           <h2><a href="/singleProduct/<%= product._id%>"><%= product.name %></a></h2>
                           <!-- Add more product details as needed -->
                           <div class="rating-result" title="90%">
                             <span>
-                              <span>90%</span>
+                              <%if(product.discountStatus==true &&new Date() <= new Date(product.discountEnd)  ){%>
+                                                            <% const percentageOff = ((product.price - product.discount_price) / product.price) * 100; %>
+                                                            <span style="font-size: 16px; background-color: rgb(255, 255, 255); border-radius: 2px; padding: 5px 10px 5px 10px;" class="old-price ml-3 text-success">- <%= percentageOff.toFixed(2) %>% OFF</span>
+                                                        <%}%>
+                           
                             </span>
                           </div>
                           <div class="product-price">
@@ -88,15 +94,15 @@
                             <% } %>
                           </div>
                           <!-- Add the form for adding to cart if needed -->
-                          <form id="myForm" action="/cart" method="post">
+                          <!-- <form id="myForm" >
                             <div class="product-action-1 show">
                               <input type="hidden" value="<%= product._id %>" name="productData_id">
                               <input type="hidden" value="1" name="qty">
-                              <button type="button" aria-label="Add To Cart" class="action-btn hover-up">
+                              <button type="button" aria-label="Add To Cart" onclick="addToCart(`<%=product._id%>`)"  id="addToCartButton" class="action-btn hover-up">
                                 <i class="fi-rs-shopping-bag-add"></i>
                               </button>
                             </div>
-                          </form>
+                          </form> -->
                         </div>
                       </div>
                     </div>
@@ -124,36 +130,7 @@
   </div>
 </main>
 
-<!--pagination-->
 
-
-
-       
-      
-          <!-- <div class="sidebar-widget price_range range mb-30">
-            <div class="widget-header position-relative mb-20 pb-10">
-              <h5 class="widget-title mb-10">Fill by price</h5>
-              <div class="bt-1 border-color-1"></div>
-            </div>
-            <div class="price-filter">
-              <div class="price-filter-inner">
-                <div id="slider-range"></div>
-                <div class="price_slider_amount">
-                  <div class="label-input">
-                    <span>Range:</span><input
-                      type="text"
-                      id="amount"
-                      name="price"
-                      placeholder="Add Your Price"
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-         
-            <a href="/filterProducts" class="btn btn-sm btn-default" onclick="filterProducts()"
-              ><i class="fi-rs-filter mr-5"></i> Filter</a>
-          </div>  -->
         
 
 
@@ -174,77 +151,54 @@
 <!-- Include jQuery UI for the slider -->
 <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
 
   <script>
-
 document.addEventListener("DOMContentLoaded", function () {
-  const searchInput = document.getElementById("searchInput");
-  const productGrid = document.getElementById("Grid");
-  const productItems = productGrid.getElementsByClassName("col-lg-4 ");
+    const searchInput = document.getElementById("searchInput");
+    const productGrid = document.getElementById("Grid");
+    const products = productGrid.getElementsByClassName("col-lg-4"); // Assuming each card is within a div with class "col-lg-4"
 
-  searchInput.addEventListener("input", function () {
-    const searchText = searchInput.value.toLowerCase();
+    searchInput.addEventListener("input", function () {
+        const searchText = searchInput.value.toLowerCase();
 
-    for (let i = 0; i < productItems.length; i++) {
-      const productName = products[i].querySelector("h2 a").textContent.toLowerCase();
-      if (!searchText||productName.includes(searchText)) {
-        productItems[i].style.display = "";
-      } else {
-        productItems[i].style.display = "none";
-      }
-    }
-  });
-})
+        for (let i = 0; i < products.length; i++) {
+            const productName = products[i].querySelector("h2 a").textContent.toLowerCase();
 
-
-
-
-
-
-// $(document).ready(function () {
-//     // Initialize the price range slider
-//     $("#slider-range").slider({
-//       range: true,
-//       min: 5000,
-//       max: 100000, // Update the max value according to your product prices
-//       values: [5000, 100000],
-//       slide: function (event, ui) {
-//         $("#amount").val("$" + ui.values[0] + " - $" + ui.values[1]);
-//       },
-//     });
-//     $("#amount").val(
-//       "$" + $("#slider-range").slider("values", 0) +
-//       " - $" +
-//       $("#slider-range").slider("values", 1)
-//     );
-//   });
-
-  // function filterProducts() {
-  //   // Get the price range values from the slider
-  //   const minPrice = $("#slider-range").slider("values", 0);
-  //   const maxPrice = $("#slider-range").slider("values", 1);
-
-  //   // Send an AJAX request to filter products
-  //   $.ajax({
-  //     type: "POST",
-  //     url: "/filterProducts", // Update the URL based on your server route
-  //     data: { minPrice, maxPrice },
-  //     success: function (data) {
-  //       // Update the product list with the filtered data
-  //       $("#.product-grid-3").html(data);
-  //     },
-  //     error: function (error) {
-  //       console.error(error);
-  //     },
-  //   });
-  // }
+            if (!searchText || productName.includes(searchText)) {
+                products[i].style.display = "";
+            } else {
+                products[i].style.display = "none";
+            }
+        }
+    });
+});
+document.addEventListener("DOMContentLoaded", function () {
+    const productGrid = document.getElementById("Grid");
+    productGrid.addEventListener("click", function (event) {
+        if (event.target.tagName === "A") {
+            event.preventDefault();
+            const page = event.target.getAttribute("href").split("=")[1];
+            fetch(`/shop?page=${page}`)
+                .then(response => response.json())
+                .then(data => {
+                  
+                    productGrid.innerHTML = data.productsHTML;
+                })
+                .catch(error => console.error("Error:", error));
+        }
+    });
+});
 
 
 
-// function submitForm() {
-//   var form = document.getElementById("myForm");
-//   form.submit();
-// }
+
+  
+
+
+
+
+
 
 
 </script> 

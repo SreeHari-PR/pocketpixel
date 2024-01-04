@@ -7,6 +7,7 @@ const multer=require("../middleware/multer");
 const addressController=require("../controllers/addressController");
 const orderController=require("../controllers/orderController");
 const couponController=require("../controllers/couponController");
+const wishlistController=require("../controllers/wishlistController");
 const {islogin,islogout}=require("../middleware/userauth");
 
 //registration
@@ -28,6 +29,7 @@ router.post('/changePassword',userController.resetPassword);
 //user profile
 router.get('/userprofile',userController.loadprofile );
 router.post('/userprofile',multer.uploadUser.single('image'), userController.userEdit );
+router.post('/userprofile',userController.userEdit);
 router.get('/userAddress',islogin,addressController.loadAddress );
 router.get('/addAddress',islogin,addressController.loadAddAddress );
 router.post('/addAddress',islogin,addressController.addAddress );
@@ -60,7 +62,14 @@ router.post('/return',islogin,orderController.returnData );
 router.get('/coupons',islogin,couponController.userCouponList);
 router.post('/applyCoupon',islogin,orderController.applyCoupon);
 
+//wallets
+router.get('/wallets',islogin,userController.loadWallets)
 
+//wishlsit
+
+router.get("/loadWishList",islogin,wishlistController.loadWishlist)
+router.post("/addWishList",islogin,wishlistController.addToWishList)
+router.delete("/removeWishlist",islogin,wishlistController.removeWishlist)
 
 
 

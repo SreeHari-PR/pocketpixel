@@ -31,6 +31,9 @@
                                       <a class="nav-link"  href="/orderSuccess" ><i class="fi-rs-shopping-bag mr-10"></i>Orders</a>
                                   </li>
                                   <li class="nav-item">
+                                    <a class="nav-link" href="/Wallets"><i class="fi-rs-shopping-bag mr-10"></i>Wallets</a>
+                                  </li>
+                                  <li class="nav-item">
                                     <a class="nav-link"  href="/coupons" ><i class="fi-rs-shopping-bag mr-10"></i>coupon</a>
                                   </li>
                                   <li class="nav-item">
@@ -108,7 +111,7 @@
                                               </aside> 
                                           </div> 
                                           <br>
-                                          <button class="btn btn-primary" type="submit">Save changes</button>
+                                          <button id="saveChangesButton" class="btn btn-primary" type="submit">Save changes</button>
                                       </form>
                                       <hr class="my-5">
                                       <div class="row" style="max-width:920px">
@@ -289,105 +292,25 @@ function validationChecking(event) {
   
   return true;
 }
-// function validationPasswordChecking(event) {
-//   const password = document.getElementById("password");
-//   const errorpassword = document.getElementById("errorpassword");
-//   const cpassword = document.getElementById("cpassword");
-//   const errorcpassword = document.getElementById("errorcpassword");
-//   errorpassword.innerHTML = password.value.trim() === "" ? "Please enter password" : password.value.length < 8 ? "Please enter a minimum of 8 characters" : "";
-//   errorcpassword.innerHTML = cpassword.value.trim() === "" ? "Please enter password" : (cpassword.value !== password.value) ? "Passwords do not match" : "";
 
-//   if (errorpassword.innerHTML || errorcpassword.innerHTML) return false;
-  
-//   return true;
-// }
-
-// function validationPasswordChecking(event) {
-//   const currentPassword = document.getElementById("currentPassword");
-//   const errorCurrentPassword = document.getElementById("errorCurrentPassword");
-//   const newPassword = document.getElementById("newPassword");
-//   const errorpassword = document.getElementById("errorpassword");
-//   const cpassword = document.getElementById("cpassword");
-//   const errorcpassword = document.getElementById("errorcpassword");
-
-//   // Validation for the current password
-//   errorCurrentPassword.innerHTML = currentPassword.value.trim() === "" ? "Please enter current password" : "";
-
-//   // Validation for the new password
-//   errorpassword.innerHTML = newPassword.value.trim() === "" ? "Please enter password" : newPassword.value.length < 8 ? "Please enter a minimum of 8 characters" : "";
-
-//   // Validation for the confirm password
-//   errorcpassword.innerHTML = cpassword.value.trim() === "" ? "Please enter password" : (cpassword.value !== newPassword.value) ? "Passwords do not match" : "";
-
-//   // Check if any validation error exists
-//   if (errorCurrentPassword.innerHTML || errorpassword.innerHTML || errorcpassword.innerHTML) {
-//     return false;
-//   }
-
-//   return true;
-// }
-
-
-// document.getElementById("passwordChangeForm").addEventListener("submit", async (e) => {
-//   e.preventDefault();
-
-//   if (validationPasswordChecking()) {
-//     try {
-//       Swal.fire({
-//         icon: 'success',
-//         title: 'Password Changed!',
-//         text: 'Your password has been successfully changed.',
-//         showConfirmButton: false,
-//         timer: 2000
-//       });
-
-//       await new Promise(resolve => setTimeout(resolve, 2000));
-
-//       const response = await fetch('/resetPassword', {
-//         method: 'POST',
-//         headers: {
-//           'Content-Type': 'application/json',
-//         },
-//         body: JSON.stringify({
-//           password: document.getElementById("password").value,
-//         }),
-//       });
-
-//       if (response.ok) {
-//         const data = await response.json();
-//         if (data.success) {
-//           window.location.href = '/userprofile';
-//         } else {
-//           console.error('Error updating password:', data.message);
-         
-//         }
-//       } else {
-//         console.error('Failed to update password:', response.status);
-        
-//       }
-//     } catch (error) {
-//       console.error('An unexpected error occurred:', error);
-//     }
-//   }
-// });
 document.getElementById("passwordChangeForm").addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  // Get input values
+
   const currentPassword = document.getElementById("currentPassword").value;
   const newPassword = document.getElementById("newPassword").value;
   const confirmPassword = document.getElementById("cpassword").value;
 
-  // Validate the form inputs
+ 
   const isValid = validationPasswordChecking(currentPassword, newPassword, confirmPassword);
 
-  // If validation fails, return from the function
+ 
   if (!isValid) {
     return false;
   }
 
   try {
-    // Make a fetch request to update the password
+   
     const response = await fetch('/resetPassword', {
       method: 'POST',
       headers: {
@@ -399,7 +322,7 @@ document.getElementById("passwordChangeForm").addEventListener("submit", async (
       }),
     });
 
-    // Check if the response is successful
+    
     if (response.ok) {
       const data = await response.json();
 
@@ -449,8 +372,7 @@ document.getElementById("passwordChangeForm").addEventListener("submit", async (
 
 // Validation function (replace with your own implementation)
 function validationPasswordChecking(currentPassword, newPassword, confirmPassword) {
-  // Add your validation logic here
-  // Return true if validation passes, false otherwise
+
   return true;
 }
 
@@ -493,6 +415,75 @@ function updateErrorMessages(errorMessage) {
   const errorCurrentPassword = document.getElementById("errorCurrentPassword");
   errorCurrentPassword.textContent = errorMessage;
 }
+
+document.getElementById("saveChangesButton").addEventListener("click", async function(event) {
+    event.preventDefault();
+
+    const isValid = validationChecking();
+
+    if (isValid) {
+        const formData = {
+            user_id: document.querySelector('input[name="user_id"]').value,
+            name: document.querySelector('input[name="name"]').value,
+            email: document.querySelector('input[name="email"]').value,
+            mobile: document.querySelector('input[name="mobile"]').value,
+            // Add other form fields as needed
+        };
+console.log(formData);
+        try {
+            const response = await fetch(`/userprofile`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                },
+                body: JSON.stringify(formData),
+            });
+
+            if (response.ok) {
+                // Assume the update is successful
+                showSuccessToast("Profile updated successfully");
+            } else {
+                // Handle the error
+                console.error("Error updating profile:", response.status);
+                showErrorToast("Profile update failed. Please try again.");
+            }
+        } catch (error) {
+            // Handle other errors
+            console.error("An unexpected error occurred:", error);
+            showErrorToast("An unexpected error occurred. Please try again.");
+        }
+    } else {
+        // Show an error toast if validation fails
+        showErrorToast("Please fix the validation errors before submitting.");
+    }
+     // Function to show success toast
+  function showSuccessToast(message) {
+    Toastify({
+      text: message,
+      backgroundColor: "green",
+      duration: 3000,
+      close: true,
+      gravity: "bottom",
+      position: "right",
+    }).showToast();
+  }
+
+  // Function to show error toast
+  function showErrorToast(message) {
+    Toastify({
+      text: message,
+      backgroundColor: "red",
+      duration: 3000,
+      close: true,
+      gravity: "bottom",
+      position: "right",
+    }).showToast();
+  }
+});
+
+
+
 
 
 

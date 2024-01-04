@@ -107,7 +107,7 @@
                                                 <%= item.paymentMethod %>
                                             </td>
                                             <td class="text-end">
-                                                <% if (item.status ) { %>  <li class="dropdown nav-item me-4">
+                                                <% if (item.status!="Delivered" ) { %>  <li class="dropdown nav-item me-4">
                         <a class="dropdown-toggle" data-bs-toggle="dropdown" href="#" id="dropdownAccount" aria-expanded="false">select status </a>
                         <div class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownAccount">
                         <button class="dropdown-item" onclick="changeStatus('<%= order._id %>', '<%= item.product._id %>', 'Confirmed')">Confirmed</button>                            
@@ -118,7 +118,9 @@
                          
                         </div>
                     </li>
-                                                    <% }%>
+                                                    <% }else{
+                                                    %><p class="m-0">(\_/)</p><P class="m-0">( •.•)</P>
+                                                    <P class="m-0"> />🖕</p><%}%>
                                                     
                                             </td>
                                         </tr>

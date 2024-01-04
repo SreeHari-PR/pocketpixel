@@ -1,0 +1,153 @@
+<%- include('../layouts/userheader') %>
+    <main class="main">
+        <div class="page-header breadcrumb-wrap">
+            <div class="container">
+                <div class="breadcrumb">
+                    <a href="index.html" rel="nofollow">Home</a>
+                    <span></span> Shop
+                    <span></span> Wishlist
+                </div>
+            </div>
+        </div>
+        <section class="mt-50 mb-50">
+            <div class="container">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="table-responsive">
+                            <table class="table shopping-summery text-center">
+                                <thead>
+                                    <tr class="main-heading">
+                                        <th scope="col" colspan="2">Product</th>
+                                        <th scope="col">Price</th>
+                                        <th scope="col">Stock Status</th>
+                                        <th scope="col">Remove</th>
+                                        <th scope="col">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% if(Wishlist && Wishlist.length> 0) {
+                                        Wishlist.forEach((wishlistData, index) => { %>
+                                        <tr>
+                                            <td class="image product-thumbnail"><img
+                                                    src="/adminassets/imgs/productIMG/<%=wishlistData.product.image[0] %>"
+                                                    alt="#"></td>
+                                            <td class="product-des product-name">
+                                                <h5 class="product-name"><a href="shop-product-right.html"></a>
+                                                    <%= wishlistData.product.name %>
+                                                </h5>
+                                                <p class="font-xs">
+                                                    <%= wishlistData.product.description %>
+                                                </p>
+                                            </td>
+                                            <td class="price" data-title="Price"><span>
+                                                    <%=wishlistData.product.discount_price %>
+                                                </span></td>
+                                            <td class="text-center" data-title="Stock">
+                                                <span class="color3 font-weight-bold">In Stock</span>
+                                            </td>
+                                            <td>
+                                                <button type="button"
+                                                    onclick="confirmRemoveWishlistItem('<%= wishlistData.product._id %>');">
+                                                    <i class="fi-rs-trash"></i>
+                                                </button>
+                                            </td>
+                                          
+                                               
+                                                <form action="/cart" method="post" class="product-form">
+                                                    <input type="hidden" name="productData_id" value="<%= wishlistData.product._id %>"
+                                                        >
+                                                        <input type="hidden" name="qty" class="w-25 py-4" value="1" min="1"
+                                                    max="10">
+                                                    <div class="detail-extralink">
+                                                        <div class="product-extra-link2 w-50 my-1">
+                                                            <td class="text-right" data-title="Cart">
+                                                                <button type="submit" class="btn btn-sm"><i class="fi-rs-shopping-bag mr-5"></i>Add to cart</button>
+                                                        
+                                        </td>
+                                                        </div>
+                                                        
+                                                    </div>
+                                                    
+
+                                                </form>
+                                           
+                                        </tr>
+                                        <% }) } %>
+                                </tbody>
+                            </table>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+
+
+    <script>
+        function confirmRemoveWishlistItem(productId) {
+            Swal.fire({
+                title: "Are you sure?",
+                text: "you want to delete the item",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Yes, remove it!",
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // User clicked "Yes," so proceed with removing the wishlist item
+                    removeWishlistItem(productId);
+                }
+            });
+        }
+
+        function removeWishlistItem(productId) {
+            fetch(`/removeWishlist?productId=${productId}`, {
+                method: 'DELETE',
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        localStorage.setItem('wishlistItemRemoved', 'true');
+                        location.reload();
+                    } else {
+                        console.error('Failed to remove wishlist item:', data.error);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error removing wishlist item:', error);
+                });
+        }
+    </script>
+
+    <style>
+    .product-form {
+        display: inline-block; /* Ensure the form is displayed inline */
+    }
+
+    .product-extra-link2 {
+        display: flex;
+        align-items: center;
+    }
+
+    .btn-product {
+        background-color: #4CAF50;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+    .btn-product:hover {
+        background-color: #45a049;
+    }
+</style>
+
+
+
+
+    <%- include('../layouts/userfooter') %>

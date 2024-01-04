@@ -5,6 +5,7 @@ const Product=require("../models/productModel");
 const Order=require("../models/orderModel");
 const {calculateProductTotal,calculateSubtotal,calculateDiscountedTotal}=require("../config/cartSum");
 const Coupon=require("../models/couponModel");
+const Wallet=require("../models/walletModel");
 const Razorpay = require("razorpay");
 
 
@@ -34,7 +35,13 @@ const loadCheckout=async(req,res)=>{
         const productTotal=calculateProductTotal(cartItems);
         const subtotalWithShipping=subtotal;
         const addressData=await Address.find({user:userId,is_listed:true});
-        res.render("user/checkout",{userData,addressData,cart:cartItems,productTotal,subtotalWithShipping});
+        const currentDate = new Date();
+        const coupon = await Coupon.find({
+          expiry: { $gt: currentDate },
+          is_listed: true,
+        }).sort({ createdDate: -1 });
+
+        res.render("user/checkout",{userData,addressData,cart:cartItems,productTotal,subtotalWithShipping,coupon});
 
 
     } catch (error) {
@@ -322,34 +329,35 @@ const orderCancel = async (req, res) => {
     const product = order.items.find(
       (item) => item.product._id.toString() === productId
     );
-
     const couponData = await Coupon.findOne({ code: order.coupon });
-    console.log(couponData,"couponData");
+
 
     if (product && product.product) {
-   
+   console.log(product.product,"product.product");
       if (product.status === "Confirmed") {
         await product.product.save();
       }
       if (
         product.paymentMethod === "Wallet" ||
-        product.paymentMethod === "onlinePayment"
+        product.paymentMethod === "Online Payment"
       ) {
         const walletData = await Wallet.findOne({ user: user_id });
+      
         if (walletData) {
-          walletData.walletBalance +=(product.price * product.quantity)- (product.price * product.quantity)*(couponData.discount)/100;
+          walletData.walletBalance +=(product.price * product.quantity)- (product.price * product.quantity)*(couponData?.discount?couponData.discount:0)/100;
           walletData.transaction.push({
             type: "credit",
-            amount:(product.price * product.quantity)- (product.price * product.quantity)*(couponData.discount)/100,
+            amount:(product.price * product.quantity)- (product.price * product.quantity)*(couponData?.discount?couponData.discount:0)/100,
           });
-        
+
           await walletData.save(); 
         }else{
           const wallet = new Wallet({
             user: user_id,
-            transaction:[{type:"credit",amount: (product.price * product.quantity)- (product.price * product.quantity)*(couponData.discount)/100}],
-            walletBalance:  (product.price * product.quantity)- (product.price * product.quantity)*(couponData.discount)/100,
+            transaction:[{type:"credit",amount: (product.price * product.quantity)- (product.price * product.quantity)*(couponData?.discount?couponData.discount:0)/100}],
+            walletBalance:  (product.price * product.quantity)- (product.price * product.quantity)*(couponData?.discount?couponData.discount:0)/100,
         });
+
         await wallet.save();
         }
 
@@ -361,7 +369,7 @@ const orderCancel = async (req, res) => {
       }
       product.status = "Cancelled";
       product.reason = reason;
-      totalAmount =totalAmount- ((product.price * product.quantity)- (product.price * product.quantity)*(couponData.discount)/100);
+      totalAmount =totalAmount- ((product.price * product.quantity)- (product.price * product.quantity)*(couponData?.discount?couponData.discount:0)/100);
     }
 
     const updateData = await Order.findByIdAndUpdate(
@@ -369,7 +377,7 @@ const orderCancel = async (req, res) => {
       {
         $set: {
           items: order.items,
-          totalAmount
+          totalAmount,
         },
       },
       { new: true }
@@ -384,6 +392,8 @@ const orderCancel = async (req, res) => {
   }
 };
 
+
+
 const returnData = async (req, res) => {
   const orderId = req.query.id;
   const { reason, productId } = req.body;
@@ -397,6 +407,7 @@ const returnData = async (req, res) => {
       path: "items.product",
       model: "Product",
     });
+    const couponData = await Coupon.findOne({ code: order.coupon });
 
   const user_id=order.user._id;
   const product = order.items.find(
@@ -411,20 +422,22 @@ const returnData = async (req, res) => {
     }
 
     const walletData = await Wallet.findOne({ user: user_id });
+    
     if (walletData) {
-      walletData.walletBalance +=(product.price * product.quantity)- (product.price * product.quantity)*(couponData.discount)/100;
+      walletData.walletBalance +=(product.price * product.quantity)- (product.price * product.quantity)*(couponData?.discount?couponData.discount:0)/100;
       walletData.transaction.push({
         type: "credit",
-        amount:(product.price * product.quantity)- (product.price * product.quantity)*(couponData.discount)/100,
+        amount:(product.price * product.quantity)- (product.price * product.quantity)*(couponData?.discount?couponData.discount:0)/100,
       });
-    
+
       await walletData.save(); 
     }else{
       const wallet = new Wallet({
         user: user_id,
-        transaction:[{type:"credit",amount: (product.price * product.quantity)- (product.price * product.quantity)*(couponData.discount)/100}],
-        walletBalance:  (product.price * product.quantity)- (product.price * product.quantity)*(couponData.discount)/100,
+        transaction:[{type:"credit",amount: (product.price * product.quantity)- (product.price * product.quantity)*(couponData?.discount?couponData.discount:0)/100}],
+        walletBalance:  (product.price * product.quantity)- (product.price * product.quantity)*(couponData?.discount?couponData.discount:0)/100,
     });
+
     await wallet.save();
     }
 

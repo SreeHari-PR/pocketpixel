@@ -24,6 +24,9 @@
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.0.9/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
+<!-- Add this in the head section of your HTML file -->
+<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
 
 
 </head>
@@ -167,15 +170,15 @@
         <div class="header-top header-top-ptb-1 d-none d-lg-block">
             <div class="container">
                 <div class="row align-items-center">
-                    <div class="col-xl-3 col-lg-4">
+                    <!-- <div class="col-xl-3 col-lg-4">
                         <div class="header-info">
                             <ul>
                                 <li><i class="fi-rs-smartphone"></i> <a href="#">(+01) - 2345 - 6789</a></li>
                                 <li><i class="fi-rs-marker"></i><a  href="page-contact.html">Our location</a></li>
                             </ul>
                         </div>
-                    </div>
-                    <div class="col-xl-6 col-lg-4">
+                    </div> -->
+                    <!-- <div class="col-xl-6 col-lg-4">
                         <div class="text-center">
                             <div id="news-flash" class="d-inline-block">
                                 <ul>
@@ -185,10 +188,10 @@
                                 </ul>
                             </div>
                         </div>
-                    </div>
+                    </div> -->
                     <div class="col-xl-3 col-lg-4">
                         <div class="header-info header-info-right">
-                            <ul>
+                            <!-- <ul>
                                 <li>
                                     <a class="language-dropdown-active" href="#"> <i class="fi-rs-world"></i> English <i class="fi-rs-angle-small-down"></i></a>
                                     <ul class="language-dropdown">
@@ -198,7 +201,7 @@
                                     </ul>
                                 </li>
                                 <li><i class="fi-rs-user"></i><a href="/login">Log In / Sign Up</a></li>
-                            </ul>
+                            </ul> -->
                         </div>
                     </div>
                 </div>
@@ -217,14 +220,7 @@
                                     <option>All Categories</option>
                                     <option>Android</option>
                                     <option>IOS</option>
-                                    <!-- <option>Cellphones</option>
-                                    <option>Computer</option>
-                                    <option>Electronics</option>
-                                    <option> Accessories</option>
-                                    <option>Home & Garden</option>
-                                    <option>Luggage</option>
-                                    <option>Shoes</option>
-                                    <option>Mother & Kids</option> -->
+                                   
                                 </select>
                                 <input type="text" id="searchInput" placeholder="Search for items...">
                             </form>
@@ -232,15 +228,15 @@
                         <div class="header-action-right">
                             <div class="header-action-2">
                                 <div class="header-action-icon-2">
-                                    <a href="shop-wishlist.html">
+                                    <a href="/loadWishList">
                                         <img class="svgInject" alt="Evara" src="/assets/imgs/theme/icons/icon-heart.svg">
-                                        <span class="pro-count blue">4</span>
+                                        <span class="pro-count blue"></span>
                                     </a>
                                 </div>
                                 <div class="header-action-icon-2">
                                     <a class="mini-cart-icon" href="/cart">
                                         <img alt="Evara" src="/assets/imgs/theme/icons/icon-cart.svg">
-                                        <span class="pro-count blue">2</span>
+                                        <span class="pro-count blue"></span>
                                     </a>
 
                                 <div class="header-action-icon-2 ml-15" style="display: flex; align-items: center;">

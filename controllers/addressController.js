@@ -64,6 +64,7 @@ const loadAddress = async (req, res) => {
        
     });
     const addressData = await address.save();
+   
 
    
     res.redirect("/userAddress");

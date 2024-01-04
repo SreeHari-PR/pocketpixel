@@ -7,11 +7,12 @@ const productController=require("../controllers/productController");
 const multer=require("../middleware/multer");
 const adminorderController=require('../controllers/adminorderController');
 const couponController=require('../controllers/couponController')
+const offerController=require("../controllers/offerController")
 
-router.get('/adminHome',adminController.getHome);
- router.get('/', adminController.getLogin);
- router.post('/', adminController.postLogin);
- router.get('/',adminauth.isLogin,adminController.adminLogout);
+router.get('/adminHome',adminauth.isLogin,adminController.getHome);
+ router.get('/',adminauth.isLogout, adminController.getLogin);
+ router.post('/',adminauth.isLogout, adminController.postLogin);
+ router.get('/logout',adminauth.isLogin,adminController.adminLogout ); 
 
 //user
 router.get("/userData",adminauth.isLogin,adminController.loadUserpage);
@@ -38,6 +39,7 @@ router.post("/editProduct",multer.uploadProduct.array('image'), productControlle
 router.get("/alluserorders", adminauth.isLogin, adminorderController.listUserOrders);
 router.get("/orderDetails", adminauth.isLogin, adminorderController.listOrderDetails);
 router.put("/orderStatusChange", adminauth.isLogin,adminorderController.orderStatusChange);
+router.get("/salesReport", adminauth.isLogin, adminorderController.loadSalesReport);
 
 
 //coupon
@@ -48,6 +50,15 @@ router.get("/couponEdit", adminauth.isLogin,couponController.loadEditCoupon );
 router.put("/couponEdit",couponController.editCoupon );
 router.get("/couponUnlist", adminauth.isLogin, couponController.unlistCoupon);
 router.get("/couponDetails", adminauth.isLogin, couponController.couponDetails);
+
+
+//offer
+router.get("/offerAdd", adminauth.isLogin,offerController.loadOfferAdd );
+router.post("/offerAdd",offerController.addOffer );
+router.get("/offerlist", adminauth.isLogin,offerController.OfferList );
+router.get("/offerEdit", adminauth.isLogin,offerController.loadOfferEdit );
+router.put("/offerEdit", adminauth.isLogin,offerController.editOffer );
+router.get("/blockOffer", adminauth.isLogin,offerController.offerBlock );
 
 
 module.exports = router;

@@ -1,4 +1,4 @@
-<!-- <style>
+<style>
     /* Increase the size of the increment and decrement buttons */
     input[type="number"]::-webkit-inner-spin-button,
     input[type="number"]::-webkit-outer-spin-button {
@@ -12,7 +12,7 @@
     input[type="number"] {
         -moz-appearance: textfield;
     }
-</style> -->
+</style>
 
 
 <%- include('../layouts/userheader.ejs') %>
@@ -58,16 +58,20 @@
                                         <%=cartData.product.name%>
                                     </td>
                                     <td class="price" data-title="discount_price"><span><%=cartData.product.discount_price%> </span></td>
-                                    <td class="text-center" data-title="Stock">
-                                          <div class="cart-product-quantity">
-                                        
-                                            <input type="number" class="form-control" name="qty" value="<%= cartData.quantity %>" min="1" max="10" step="1" data-decimals="0"  required onchange="updateCart('<%= cartData.product._id %>', this.value)">
-                                        </div>  
-                                        
-                                        
+                                    <td class="text-center col-lg-2 mb-3 " data-title="Stock">
+                                        <div class="cart-product-quantity">
+                                        <div class="input-group input-group-sm">
+                                            <button class="btn btn-outline-secondary btn-sm " type="button" onclick="decreaseQuantity('<%= cartData.product._id %>')">-</button>
+                                            <input type="number" readonly class="form-control form-control-sm text-center" name="qty" value="<%= cartData.quantity %>" min="1" max="10" step="1" data-decimals="0" required onchange="updateCart('<%= cartData.product._id %>', this.value)">
+                                            <button class="btn btn-outline-secondary btn-sm" type="button" onclick="increaseQuantity('<%= cartData.product._id %>')">+</button>
+                                        </div>
+                                    </div>
                                     </td>
+                                        
+                                        
+                                    
                                     <td class="text-right" data-title="Cart">
-                                        <span><%=productTotal[index] %></span>
+                                        <span class="subtotal "   id="productTotal_<%= index %>"><%=productTotal[index] %></span>
                                     </td>
                                     <td>
                                         <button type="button" onclick="confirmRemoveCartItem('<%= cartData.product._id %>');" style="background-color: #e74c3c; color: #fff; padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer;">
@@ -191,15 +195,76 @@
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                location.reload();
+                 location.reload();
+                //  $('input[name="qty"]').val(newQuantity);
+               
 
-            } else {
+            }
+          else {
                 console.error('Failed to update cart:', data.error);
             }
         })
         .catch(error => {
             console.error('Error updating cart:', error);
         });
+    }
+
+    // Convert the cart array to a JSON string and parse it in JavaScript
+    // const cartData = JSON.parse('<%- JSON.stringify(cart) %>');
+    // console.log(cartData);
+
+    // // Attach an event listener to the quantity input
+    // $('.cart-quantity-input').on('input', function () {
+    //     // Capture the updated data
+    //     const rowIndex = $(this).closest('tr').data('row-index');
+    //     const productId = cartData[rowIndex].product._id; // Access the cart data using JavaScript
+    //     const newQuantity = $(this).val(); // Get the new quantity
+
+    //     // Call the updateCart function with the captured data
+    //     updateCart(productId, newQuantity, rowIndex);
+    // });
+
+    // // Function to update cart quantity
+    // function updateCart(productId, newQuantity, rowIndex) {
+    //     $.ajax({
+    //         type: 'POST',
+    //         url: '/updateCart', // Replace with your actual server endpoint
+    //         data: {
+    //             productId: productId,
+    //             quantity: newQuantity,
+    //             rowIndex: rowIndex // Pass the rowIndex to the server
+    //         },
+    //         success: function (data) {
+    //             // Update the product total in the corresponding row
+    //             $('#productTotal_' + rowIndex).text(data.productTotal);
+
+    //             // Optionally, you can update other UI elements or perform additional actions
+    //         },
+    //         error: function (error) {
+    //             console.error('Error updating cart:', error);
+    //         }
+    //     });
+    // }
+
+
+   
+
+    function increaseQuantity(productId) {
+        var inputElement = $(`input[name="qty"]`);
+        var currentQuantity = parseInt(inputElement.val());
+        if (currentQuantity < 10) {
+            inputElement.val(currentQuantity + 1);
+            updateCart(productId, currentQuantity + 1);
+        }
+    }
+
+    function decreaseQuantity(productId) {
+        var inputElement = $(`input[name="qty"]`);
+        var currentQuantity = parseInt(inputElement.val());
+        if (currentQuantity > 1) {
+            inputElement.val(currentQuantity - 1);
+            updateCart(productId, currentQuantity - 1);
+        }
     }
     
 

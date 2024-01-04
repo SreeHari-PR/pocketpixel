@@ -1,6 +1,14 @@
 
 const User=require("../models/user")
-const bcrypt=require("bcrypt")
+const bcrypt=require("bcrypt");
+const Order=require("../models/orderModel");
+const Product=require("../models/productModel");
+const Category=require("../models/categoryModel");
+const {
+  getMonthlyDataArray,
+  getDailyDataArray,
+  getYearlyDataArray,
+} = require("../config/chartData");
 
 
 //adminlogin
@@ -49,18 +57,76 @@ const postLogin= async(req,res)=>{
 };
 
 //admin homepage
-const getHome=async(req,res)=>{
-    
+const getHome=async (req, res) => {
   try {
-      const userData = await User.findById({_id:req.session.admin_id})
-      
-      res.render('admin/adminHome',{admin:userData})
+    let query = {};
+    const adminData = await User.findById(req.session.admin_id);
+   
+    const totalRevenue = await Order.aggregate([
+      { $match: {    "items.status": "Delivered"  } }, // Include the conditions directly
+      { $group: { _id: null, totalAmount: { $sum: "$totalAmount" } } },
+    ]);
+
+    const totalUsers = await User.countDocuments({ is_blocked: 1});
+    const totalOrders = await Order.countDocuments();
+    const totalProducts = await Product.countDocuments();
+    const totalCategories = await Category.countDocuments();
+    const orders = await Order.find().populate("user").limit(10).sort({ orderDate: -1 });
+
+    const monthlyEarnings = await Order.aggregate([
+      {
+        $match: {
+          "items.status": "Delivered" ,
+          orderDate: {
+            $gte: new Date(new Date().getFullYear(), new Date().getMonth(), 1),
+          },
+        },
+      },
+      { $group: { _id: null, monthlyAmount: { $sum: "$totalAmount" } } },
+    ]);
+    const totalRevenueValue =
+    totalRevenue.length > 0 ? totalRevenue[0].totalAmount : 0;
+  const monthlyEarningsValue =
+    monthlyEarnings.length > 0 ? monthlyEarnings[0].monthlyAmount : 0;
+
+    const newUsers = await User.find({ is_blocked: 1,isAdmin:0  })
+      .sort({ date: -1 })
+      .limit(5);
+
+      // Get monthly data
+      const monthlyDataArray = await getMonthlyDataArray();
+
+      // Get daily data
+      const dailyDataArray = await getDailyDataArray();
+    
+      // Get yearly data
+      const yearlyDataArray = await getYearlyDataArray();
+
+    const monthlyOrderCounts= monthlyDataArray.map((item) => item.count)
+  
+    const dailyOrderCounts= dailyDataArray.map((item) => item.count)
+
+    const yearlyOrderCounts= yearlyDataArray.map((item) => item.count)
+
+    res.render("admin/adminHome", {
+      admin: adminData,
+      totalRevenue:totalRevenueValue,
+      totalOrders,
+      totalCategories,
+      totalProducts,
+      totalUsers,
+      newUsers,
+      orders,
+      monthlyEarningsValue,
+      monthlyOrderCounts,
+      dailyOrderCounts,
+      yearlyOrderCounts,
+    });
   } catch (error) {
-      console.log(error.message)
+    console.log(error.message);
+    // Handle errors appropriately
   }
-
 };
-
 //user page
 const loadUserpage=async (req,res)=>{
   try{
@@ -118,7 +184,7 @@ const adminLogout = async (req, res) => {
   try {
     req.session.destroy();
 
-    res.redirect("/adminLogin");
+    res.redirect("/admin");
   } catch (error) {
     console.log(error.message);
   }

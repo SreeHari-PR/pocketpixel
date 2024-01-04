@@ -168,11 +168,56 @@
                                                     <button type="submit" class=" btn-product btn-cart"><span>Add To Cart</span></button>
     
     
-                                                    <button aria-label="Add To Wishlist" class=" btn action-btn hover-up p-3  "
-                                                        ><i class="fi-rs-heart  "></i></button>
+                                                <a aria-label="Add To Wishlist" class=" btn action-btn hover-up p-3"href="/loadWishList"
+                                                        ><i class="fi-rs-heart  "></i></a>
                                                 </div>
                                             </div>
                                         </form>
+                                        <form action="/addWishList" method="post" class="product-form">
+                                            <input type="hidden" value="<%= product._id %>" name="productId">
+                                            <div class="detail-extralink">
+                                                <div class="product-extra-link2 w-50 my-1">
+                                                    <button type="button" class="btn-product wishlist-btn"
+                                                        onclick="addToWishlist()">
+                                                        <span>
+                                                            Add To Wishlist
+                                                        </span>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </form>
+
+                                        <style>
+                                            /* Style the wishlist button */
+                                            .wishlist-btn {
+                                                display: inline-block;
+                                                padding: 10px 15px;
+                                                /* Adjust the padding as needed */
+                                                background-color: #ff3366;
+                                                /* Set your desired background color */
+                                                color: #fff;
+                                                /* Set your desired text color */
+                                                text-decoration: none;
+                                                border-radius: 5px;
+                                                /* Add rounded corners if desired */
+                                                transition: background-color 0.3s ease;
+                                                /* Add a smooth transition effect */
+                                            }
+
+                                            /* Style the heart icon */
+                                            .fi-rs-heart {
+                                                color: #ff3366;
+                                                /* Match the background color or set your desired color */
+                                                margin-right: 5px;
+                                                /* Add some space between the heart icon and text */
+                                            }
+
+                                            /* Hover effect for the wishlist button */
+                                            .wishlist-btn:hover {
+                                                background-color: #e6295b;
+                                                /* Change the background color on hover */
+                                            }
+                                        </style>
                                      
                                         <ul class="product-meta font-xs color-grey mt-50">
                                             <li class="mb-5">SKU: <a href="#">FWM15VKT</a></li>
@@ -206,5 +251,42 @@ function changeMainImage(imageUrl) {
       this.style.transformOrigin = `${x}% ${y}%`;
     });
     </script>
+<script>
+    function addToWishlist() {
+        const productId = document.querySelector('[name="productId"]').value;
+
+        fetch('/addWishList', {
+            method: 'POST',
+            body: JSON.stringify({ productId }),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Show success SweetAlert
+                    Swal.fire({
+                        title: "Success!",
+                        text: data.message,
+                        icon: "success",
+                    });
+                } else {
+                    // Show error SweetAlert
+                    Swal.fire({
+                        title: "Error!",
+                        text: data.error || "Failed to add the product to the wishlist.",
+                        icon: "error",
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error adding to wishlist:', error);
+            });
+    }
+</script>
+
+
+
   
   <%- include('../layouts/userfooter.ejs') %>

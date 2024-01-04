@@ -71,6 +71,7 @@
                                     </thead>
 
                                     <tbody>
+                               
                                         <% let subtotal=0; order.items.forEach(function(item) { 
                                             let total=item.product.discount_price?item.product.discount_price * item.quantity:item.product.price * item.quantity;
                                             subtotal =order.totalAmount; %>
@@ -215,7 +216,6 @@
     <script>
         function cancelProduct(id, productId,status) {
             const reason = document.getElementById(`reason${productId}`).value;
-            console.log(id, "akkkkk", productId);
 
 
             if (!reason) {
@@ -308,6 +308,7 @@ if (status==="Confirmed") {
 
    
 }}
+
 
 
 
