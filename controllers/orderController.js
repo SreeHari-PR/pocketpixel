@@ -76,11 +76,18 @@ const razorpayOrder = async (req, res) => {
 
     const cartItems = cart.items || [];
     let totalAmount = 0;
-    totalAmount = cartItems.reduce(
-      (acc, item) => acc + (item.product.discount_price? item.product.discount_price * item.quantity:item.product.price * item.quantity || 0),
-      0
-    );
 
+
+
+    totalAmount = cartItems.reduce((acc, item) => {
+      if (item.product.discountPrice && item.product.discountStatus &&
+        new Date(item.product.discountStart) <= new Date() &&
+        new Date(item.product.discountEnd) >= new Date()) {
+        return acc + (item.product.discountPrice * item.quantity || 0);
+      } else {
+        return acc + (item.product.price * item.quantity || 0);
+      }
+    }, 0); 
 
 
     if (couponCode) {
@@ -152,11 +159,15 @@ const checkOutPost = async (req, res) => {
       await product.save();
     }
 
-    let totalAmount = cartItems.reduce(
-      (acc, item) => acc + (item.product.discount_price * item.quantity || 0),
-      0
-    );
-    
+    let totalAmount = cartItems.reduce((acc, item) => {
+      if (item.product.discountPrice && item.product.discountStatus &&
+        new Date(item.product.discountStart) <= new Date() &&
+        new Date(item.product.discountEnd) >= new Date()) {
+        return acc + (item.product.discountPrice * item.quantity || 0);
+      } else {
+        return acc + (item.product.price * item.quantity || 0);
+      }
+    }, 0);
   
     if (couponCode) {
       totalAmount = await applyCoup(couponCode, totalAmount, userId);
@@ -194,13 +205,12 @@ const checkOutPost = async (req, res) => {
             product: cartItem.product._id,
             quantity: cartItem.quantity,
             size: cartItem.size,
-            price: cartItem.product.discount_price?cartItem.product.discount_price:cartItem.product.price,
+            price:cartItem.product.discountPrice &&cartItem.product.discountStatus &&new Date(cartItem.product.discountStart) <= new Date() && new Date(cartItem.product.discountEnd) >= new Date()?cartItem.product.discountPrice:cartItem.product.price,
             status: "Confirmed",
             paymentMethod: paymentMethod,
             paymentStatus: "success",
           })),
         });
-        console.log(order);
 
         await order.save();
       } else {
@@ -210,7 +220,6 @@ const checkOutPost = async (req, res) => {
       }
     }
       if (paymentMethod == "onlinePayment") {
-      console.log(req.body);
       const order = new Order({
         user: userId,
         address: address,
@@ -223,8 +232,7 @@ const checkOutPost = async (req, res) => {
           quantity: cartItem.quantity,
           size: cartItem.size,
        
-          price: cartItem.product.discount_price?cartItem.product.discount_price:cartItem.product.price,
-          status: "Confirmed",
+          price:cartItem.product.discountPrice &&cartItem.product.discountStatus &&new Date(cartItem.product.discountStart) <= new Date() && new Date(cartItem.product.discountEnd) >= new Date()?cartItem.product.discountPrice:cartItem.product.price,          status: "Confirmed",
           paymentMethod: "Online Payment",
           paymentStatus: "success",
         })),
@@ -244,8 +252,7 @@ const checkOutPost = async (req, res) => {
           quantity: cartItem.quantity,
           size: cartItem.size,
      
-          price: cartItem.product.discount_price?cartItem.product.discount_price:cartItem.product.price,
-          status: "Confirmed",
+          price:cartItem.product.discountPrice &&cartItem.product.discountStatus &&new Date(cartItem.product.discountStart) <= new Date() && new Date(cartItem.product.discountEnd) >= new Date()?cartItem.product.discountPrice:cartItem.product.price,          status: "Confirmed",
           paymentMethod: paymentMethod,
           paymentStatus: "Pending",
         })),
@@ -277,7 +284,7 @@ const loadOrderDetails = async (req, res) => {
       .populate({
         path: "items.product",
         model: "Product",
-      });
+      })  .sort({ orderDate: -1 });
 
     if (userData) {
       res.render("user/orders", { userData, order });
@@ -333,7 +340,6 @@ const orderCancel = async (req, res) => {
 
 
     if (product && product.product) {
-   console.log(product.product,"product.product");
       if (product.status === "Confirmed") {
         await product.product.save();
       }

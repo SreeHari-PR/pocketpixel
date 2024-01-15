@@ -31,7 +31,7 @@
     <section class="mt-50 mb-50">
         <div class="container">
             <div class="row">
-                <% if (cart.length>0) {%>
+                <% if (cart && cart.length > 0) {%>
                 <div class="col-12">
                     <div class="table-responsive">
                    
@@ -57,8 +57,14 @@
                                     <td class="product-des product-name">
                                         <%=cartData.product.name%>
                                     </td>
-                                    <td class="price" data-title="discount_price"><span><%=cartData.product.discount_price%> </span></td>
-                                    <td class="text-center col-lg-2 mb-3 " data-title="Stock">
+                                    <td class="price" data-title="Price">
+                                        <%if (cartData.product.discountPrice &&cartData.product.discountStatus &&new Date(cartData.product.discountStart) <= new Date() && new Date(cartData.product.discountEnd) >= new Date()) {
+                                           %> <span>  <%=cartData.product.discountPrice%>   </span><%
+                                        }else{
+                                            %> <span>  <%=cartData.product.price%>   </span><%
+                                        }
+                                            %>
+                                    </td>                                    <td class="text-center col-lg-2 mb-3 " data-title="Stock">
                                         <div class="cart-product-quantity">
                                         <div class="input-group input-group-sm">
                                             <button class="btn btn-outline-secondary btn-sm " type="button" onclick="decreaseQuantity('<%= cartData.product._id %>')">-</button>
@@ -137,7 +143,7 @@
                 <% } else{
                     %><div class="container mt-5">
                         <div class="alert alert-info " role="alert">
-                          <h2 class="alert-heading">Cart Empty</h2>
+                          <h2 class="alert-heading"> &#x1F6D2; Cart Empty</h2>
                           <p class="mb-0">Your shopping cart is currently empty. Start adding items to your cart.</p>
                         </div>
                       </div>
@@ -196,7 +202,6 @@
         .then(data => {
             if (data.success) {
                  location.reload();
-                //  $('input[name="qty"]').val(newQuantity);
                
 
             }
@@ -208,43 +213,6 @@
             console.error('Error updating cart:', error);
         });
     }
-
-    // Convert the cart array to a JSON string and parse it in JavaScript
-    // const cartData = JSON.parse('<%- JSON.stringify(cart) %>');
-    // console.log(cartData);
-
-    // // Attach an event listener to the quantity input
-    // $('.cart-quantity-input').on('input', function () {
-    //     // Capture the updated data
-    //     const rowIndex = $(this).closest('tr').data('row-index');
-    //     const productId = cartData[rowIndex].product._id; // Access the cart data using JavaScript
-    //     const newQuantity = $(this).val(); // Get the new quantity
-
-    //     // Call the updateCart function with the captured data
-    //     updateCart(productId, newQuantity, rowIndex);
-    // });
-
-    // // Function to update cart quantity
-    // function updateCart(productId, newQuantity, rowIndex) {
-    //     $.ajax({
-    //         type: 'POST',
-    //         url: '/updateCart', // Replace with your actual server endpoint
-    //         data: {
-    //             productId: productId,
-    //             quantity: newQuantity,
-    //             rowIndex: rowIndex // Pass the rowIndex to the server
-    //         },
-    //         success: function (data) {
-    //             // Update the product total in the corresponding row
-    //             $('#productTotal_' + rowIndex).text(data.productTotal);
-
-    //             // Optionally, you can update other UI elements or perform additional actions
-    //         },
-    //         error: function (error) {
-    //             console.error('Error updating cart:', error);
-    //         }
-    //     });
-    // }
 
 
    

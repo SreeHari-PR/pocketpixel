@@ -52,10 +52,10 @@
 
 
                 <section class="content-body p-xl-4">
-                  <form action="/editAddress" method="post"   onsubmit="return validationChecking()">
+                  <form     onsubmit="return validationChecking()">
                     <div class="row">
 
-                      <input type="hidden" name="address_id" value="<%=Address._id %>">
+                      <input type="hidden" id="address_id" name="address_id" value="<%=Address._id %>">
                       <div class="form-group">
                         <input type="text" id="houseName" name="houseName"  value="<%=Address.houseName %>" placeholder="Enter Name" />
                         <div id="errorhouseName" class="ms-2 text-danger"></div>
@@ -83,7 +83,7 @@
                     </div>
                     <br>
                     <div class="text-center">
-                      <button class="btn btn-primary " type="submit">Save changes</button>
+                      <button class="btn btn-primary " type="button" onclick="formsubmitData()">Save changes</button>
                     </div>
 
 
@@ -178,6 +178,44 @@ function validationChecking() {
 
   return isValid;
 }
+
+
+
+        const formsubmitData = () => {
+    var formData = {
+        address_id: document.getElementById('address_id').value,
+        houseName: document.getElementById('houseName').value,
+        street: document.getElementById('street').value,
+        city: document.getElementById('city').value,
+        state: document.getElementById('state').value,
+        pincode: document.getElementById('pincode').value
+    };
+
+    console.log(formData); // Log the entire object
+
+    fetch('/editAddress', {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            window.location.href = '/userAddress';
+        }
+        console.log(data);
+    })
+    .catch(error => {
+        // Handle any errors that occur during the fetch
+        console.error('Error:', error);
+    });
+}
+
+    
+
+
 
 </script>
   

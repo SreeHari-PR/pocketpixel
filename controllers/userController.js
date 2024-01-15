@@ -78,7 +78,7 @@ const postLogin = async (req, res) => {
         });
       }
     } else {
-      res.render("user/login");
+      res.render("user/login",{message:'user doesnt exist'});
     }
   } catch (error) {
     console.log(error.message);
@@ -90,7 +90,12 @@ const postLogin = async (req, res) => {
 
 const getSignup = (req, res) => {
   
-  res.render('user/register');
+  try {
+    referral = req.query.referralCode;
+    res.render("user/register",referral);
+  } catch (error) {
+    console.log(error.message);
+  }
 
 };
 
@@ -103,7 +108,23 @@ const postSignup = async (req, res) => {
     if (!email || !mobile || !name || !password) {
       return res.status(400).json({ error: 'Name, and password are required' });
     }
+    req.session.referralCode = req.body.referralCode || null;
+    const referralCode = req.session.referralCode;
+
     const existMail = await User.findOne({ email: email });
+    if (referralCode) {
+      referrer = await User.findOne({ referralCode:referralCode });
+
+      if (!referrer) {
+        res.render("user/register", { message: "Invalid referral code." });
+      }
+
+      if (referrer.userReferred.includes(req.body.email)) {
+        res.render("user/register", {
+          message: "Referral code has already been used by this email.",
+        });
+      }
+    }
 
     if (existMail) {
       res.render("user/register", { message: "this user already exists" });
@@ -149,6 +170,52 @@ const verifyOtp = async (req, res) => {
         const userDataSave = await user.save();
         if (userDataSave && userDataSave.isAdmin === 0) {
           req.session.user_id = userDataSave._id;
+          if (req.session.referralCode) {
+        
+            const walletData = await Wallet.findOne({ user: req.session.user_id });
+    if (walletData) {
+      walletData.walletBalance +=50;
+      walletData.transaction.push({
+        type: "credit",
+        amount:50,
+      });
+    
+      await walletData.save(); 
+    }else{
+      const wallet = new Wallet({
+        user: req.session.user_id,
+        transaction:[{type:"credit",amount:50}],
+        walletBalance:50,
+    });
+    await wallet.save();
+    }
+   
+            const referrer = await User.findOne({
+              referralCode: req.session.referralCode,
+            });
+            const user = await User.findOne({ _id: req.session.user_id });
+            referrer.userReferred.push(user.email);
+            await referrer.save();
+            const walletrefer = await Wallet.findOne({ user: referrer._id });
+          
+            if (walletrefer) {
+              walletrefer.walletBalance +=100;
+              walletrefer.transaction.push({
+                type: "credit",
+                amount:100,
+              });
+            
+              await walletrefer.save(); 
+            }else{
+              const wallet = new Wallet({
+                user: referrer._id,
+                transaction:[{type:"credit",amount:100}],
+                walletBalance:100,
+            });
+            await wallet.save();
+            }
+            
+          }
           res.redirect("/");
         } else {
           res.render("user/otp", { message: "Registration Failed" });
@@ -235,7 +302,7 @@ const loadResetPassword=async(req,res)=>{
       const user = await User.findById(userId);
 
       res.render("user/resetPassword", { User: user });
-    } else {
+    } else {  
       res.redirect("/forgotPassword");
     }
   } catch (error) {
@@ -309,7 +376,7 @@ const userEdit = async (req, res) => {
 
 
 
-const resetPassword = async (req, res) => {
+const changePassword = async (req, res) => {
   try {
     const user_id = req.session.user_id;
     const current_password = req.body.currentPassword;
@@ -384,7 +451,9 @@ const loadShopCategory = async (req, res) => {
   try {
     const userId = req.session.user_id;
     const userData = await User.findById(userId);
-    const categoryId = req.query.id;
+    const categoryId = req.query.categoryId;
+    const searchQuery = req.query.query || ''; // Assuming you have a 'search' parameter in your URL
+ 
  
     let totalProducts;
 
@@ -393,7 +462,7 @@ const loadShopCategory = async (req, res) => {
     let sortOption = {};
     if (sort === 'asc') {
         sortOption = { discount_price: 1 }; 
-    } else if (sort === 'dsc') {
+    } else if (sort === 'desc') {
         sortOption = { discount_price: -1 }; 
     } else {
         
@@ -401,6 +470,11 @@ const loadShopCategory = async (req, res) => {
     }
 
     const findQuery = categoryId ? { category: categoryId } : {};
+    if (searchQuery) {
+      // If there's a search query, add it to the findQuery
+      findQuery.name = { $regex: new RegExp(searchQuery, 'i') };
+
+  }
 
     totalProducts = await Product.countDocuments(findQuery);
 
@@ -413,9 +487,8 @@ const loadShopCategory = async (req, res) => {
       page: page,
       limit: itemsPerPage,
       sort:sortOption,
-      findQuery
+      query:findQuery
     };
-    console.log(options);
 
     const paginatedProducts =  await Product.paginate(findQuery, options)
     
@@ -426,18 +499,15 @@ const loadShopCategory = async (req, res) => {
       totalPages: totalPages,
       currentPage: paginatedProducts.page,
       categories,
-      
-      
-    
-      
-    });
+      query:findQuery,
+      sort,
+      categoryId: categoryId,
+      searchQuery: searchQuery
+     });
   } catch (error) {
     console.log(error.message);
   }
 };
-
-
-
 
 
 
@@ -473,10 +543,8 @@ const loadWallets = async (req, res) => {
     const walletData = await Wallet.findOne({ user: userId });
   
     if (!walletData) {
-   console.log(walletData,"walletDataada");
       return res.render("user/wallets", { userData, wallet: [] });
     }
-    console.log(walletData,"walletData");
 
     res.render("user/wallets", { userData, wallet: walletData });
   } catch (err) {   
@@ -485,6 +553,54 @@ const loadWallets = async (req, res) => {
     res.status(500).send("Internal Server Error");
   }
 };
+
+const loadAbout = async (req, res) => {
+  try {
+    const userId = req.session.user_id;
+
+    const userData = await User.findById(userId);
+  
+    if (userData) {
+      res.render("user/about", {  userData,  });
+    } else {
+      res.render("user/about", { userData: null,  });
+    }
+  } catch (error) {
+    console.log(error.message);
+  }
+};
+const loadContact = async (req, res) => {
+  try {
+    const userId = req.session.user_id;
+
+    const userData = await User.findById(userId);
+  
+    if (userData) {
+      res.render("user/contact", {  userData,  });
+    } else {
+      res.render("user/contact", { userData: null,  });
+    }
+  } catch (error) {
+    console.log(error.message);
+  }
+};
+const resetPassword = async (req, res) => {
+  try {
+    const user_id = req.session.user_id;
+    const password = req.body.password;
+    const secure_password = await securePassword(password);
+    const updatedData = await User.findByIdAndUpdate(
+      { _id: user_id },
+      { $set: { password: secure_password } }
+    );
+    if (updatedData) {
+      res.redirect("/userprofile");
+    }
+  } catch (error) {
+    console.log(error.message);
+  }
+};
+
 
 
 
@@ -526,6 +642,11 @@ laodForgetpassword,
 forgotPasswordOTP,
 loadResetPassword,
 loadWallets,
+loadAbout,
+loadContact,
+changePassword,
+
+
 
 
  }

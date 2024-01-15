@@ -74,6 +74,7 @@ const loadCartPage = async (req, res) => {
       const product_Id = req.body.productData_id;
 
       const { qty } = req.body;
+      console.log(req.body,"hhhhhh");
       const existingCart = await Cart.findOne({ user: userId });
    
       let newCart = {};
@@ -97,6 +98,7 @@ const loadCartPage = async (req, res) => {
         );
   
         await existingCart.save();
+        return res.status(200).json({ success: true, message: 'Cart updated successfully' });
       }    else {
     
         newCart = new Cart({
@@ -106,8 +108,8 @@ const loadCartPage = async (req, res) => {
         });
    
         await newCart.save();
+        return res.status(200).json({ success: true, message: 'New cart created successfully' });
       }
-      res.redirect('/cart')
       
     } catch (error) {
       console.error("Error adding product to cart:", error);

@@ -131,14 +131,21 @@
                                                 <span class="font-small ml-5 text-muted"> (25 reviews)</span>
                                             </div>
                                         </div>
-                                        <div class="clearfix product-price-cover">
-                                            <div class="product-price primary-color float-left">
-                                                <ins><span class="text-brand">₹<%= product.discount_price %>
-                                                    </span></ins>
-                                                <ins><span class="old-price font-md ml-15">₹<s><%= product.price %></s>
-                                                            </span></ins>
-                                                <span class="save-price  font-md color3 ml-15">25% Off</span>
-                                            </div>
+                                        <div class="product-price primary-color float-left">
+                                            <% if (product.discountPrice && product.discountPrice !=product.price) { %>
+                                                <% const percentageOff = ((product.price - product.discountPrice) / product.price) * 100; %>
+
+                                                <ins><span class="text-brand">₹<%= product.discountPrice %>
+                                                </span></ins>
+                                            <ins><span class="old-price font-md ml-15"><s>₹<%= product.price %></s>
+                                                        </span></ins>
+                                            <span class="save-price  font-md color3 ml-15"><%= percentageOff.toFixed(2) %>%Off</span>
+                            
+                                                <% } else { %>
+                                                    <ins><span class="text-brand">₹<%= product.price %>
+                                      
+                                                <% } %>
+                                        
                                         </div>
                                         <div class="bt-1 border-color-1 mt-15 mb-15"></div>
                                         <div class="short-desc mb-30">
@@ -159,20 +166,19 @@
 
 
                                         <div class="bt-1 border-color-1 mt-30 mb-30"></div>
-                                        <form action="/cart" method="post">
-                                            <input type="hidden" value="<%= product._id %>"name="productData_id" id="">
-                                            <div class="detail-extralink">
-                                                <input type="number" name="qty" class="w-25 py-4" value="1" min="1" max="10">
+                               
+                                            <input type="hidden" value="<%= product._id %>"   name="productData_id" id="productData_id">                                            <div class="detail-extralink">
+                                                <input type="number" name="qty" id="qty" class="w-25 py-4" value="1" min="1" max="10">
                                                 <div class="product-extra-link2 w-50 my-1">
     
-                                                    <button type="submit" class=" btn-product btn-cart"><span>Add To Cart</span></button>
+                                                    <button type="submit" class=" btn-product btn-cart" onclick="addToCart()"><span>Add To Cart</span></button>
     
     
                                                 <a aria-label="Add To Wishlist" class=" btn action-btn hover-up p-3"href="/loadWishList"
                                                         ><i class="fi-rs-heart  "></i></a>
                                                 </div>
                                             </div>
-                                        </form>
+                                  
                                         <form action="/addWishList" method="post" class="product-form">
                                             <input type="hidden" value="<%= product._id %>" name="productId">
                                             <div class="detail-extralink">
@@ -271,6 +277,7 @@ function changeMainImage(imageUrl) {
                         text: data.message,
                         icon: "success",
                     });
+                   
                 } else {
                     // Show error SweetAlert
                     Swal.fire({
@@ -284,6 +291,38 @@ function changeMainImage(imageUrl) {
                 console.error('Error adding to wishlist:', error);
             });
     }
+
+
+
+    
+function addToCart() {
+
+    const qtyData = document.getElementById('qty').value;
+    const productDataId =  document.getElementById('productData_id').value;
+    const requestData = {
+        qty: qtyData,
+        
+        productData_id: productDataId   
+      };
+
+
+  fetch('/cart', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(requestData),  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+        console.log("buhjkhfgukdgfuikedgfuiyehgi");
+        window.location.href = '/cart';
+    } })
+  .catch(error => {
+    console.error('Error:', error);
+    alert('Error occurred while placing order');
+  });
+}
 </script>
 
 

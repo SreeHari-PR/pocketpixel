@@ -2,8 +2,14 @@ const calculateSubtotal = (cart) => {
     
        let subtotal = 0;
        for (const cartItem of cart) {
+        const isDiscounted = cartItem.product.discountStatus &&
+        new Date(cartItem.product.discountStart) <= new Date() &&
+        new Date(cartItem.product.discountEnd) >= new Date();
     
-         subtotal += cartItem.product.discount_price * cartItem.quantity;
+    const priceToConsider = isDiscounted ? cartItem.product.discountPrice : cartItem.product.price;
+    
+      subtotal += priceToConsider * cartItem.quantity;
+    
        }
        return subtotal;
      };
@@ -11,7 +17,13 @@ const calculateSubtotal = (cart) => {
      const calculateProductTotal = (cart) => {
        const productTotals = [];
        for (const cartItem of cart) {
-         const total = cartItem.product.discount_price * cartItem.quantity;
+        const isDiscounted = cartItem.product.discountStatus &&
+        new Date(cartItem.product.discountStart) <= new Date() &&
+        new Date(cartItem.product.discountEnd) >= new Date();
+    
+    const priceToConsider = isDiscounted ? cartItem.product.discountPrice : cartItem.product.price;
+    
+    const total = priceToConsider * cartItem.quantity; 
          productTotals.push(total);
        }
        return productTotals;

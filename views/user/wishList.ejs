@@ -35,33 +35,33 @@
                                                 <h5 class="product-name"><a href="shop-product-right.html"></a>
                                                     <%= wishlistData.product.name %>
                                                 </h5>
-                                                <p class="font-xs">
-                                                    <%= wishlistData.product.description %>
-                                                </p>
                                             </td>
                                             <td class="price" data-title="Price"><span>
-                                                    <%=wishlistData.product.discount_price %>
+
+                                                    <%if (wishlistData.product.discountPrice &&wishlistData.product.discountStatus &&new Date(wishlistData.product.discountStart) <= new Date() && new Date(wishlistData.product.discountEnd) >= new Date()) {
+                                                        %> <span>  <%=wishlistData.product.discountPrice%>   </span><%
+                                                     }else{
+                                                         %> <span>  <%=wishlistData.product.price%>   </span><%
+                                                     }
+                                                         %>
                                                 </span></td>
                                             <td class="text-center" data-title="Stock">
                                                 <span class="color3 font-weight-bold">In Stock</span>
                                             </td>
                                             <td>
-                                                <button type="button"
-                                                    onclick="confirmRemoveWishlistItem('<%= wishlistData.product._id %>');">
-                                                    <i class="fi-rs-trash"></i>
+                                                <button type="button"  onclick="confirmRemoveWishlistItem('<%= wishlistData.product._id %>');" style="background-color: #e74c3c; color: #fff; padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer;">
+                                                    <i class="fi-rs-trash me-2"></i> Remove
                                                 </button>
+                                                
                                             </td>
                                           
                                                
-                                                <form action="/cart" method="post" class="product-form">
-                                                    <input type="hidden" name="productData_id" value="<%= wishlistData.product._id %>"
-                                                        >
-                                                        <input type="hidden" name="qty" class="w-25 py-4" value="1" min="1"
-                                                    max="10">
+                                            <input type="hidden" value="<%= wishlistData.product._id %>"   name="productData_id" id="productData_id">                                            <div class="detail-extralink">
+                                                <input type="hidden" name="qty" id="qty" class="w-25 py-4" value="1" min="1" max="10">
                                                     <div class="detail-extralink">
                                                         <div class="product-extra-link2 w-50 my-1">
                                                             <td class="text-right" data-title="Cart">
-                                                                <button type="submit" class="btn btn-sm"><i class="fi-rs-shopping-bag mr-5"></i>Add to cart</button>
+                                                                <button  class="btn btn-sm" onclick="addToCart( )"><i class="fi-rs-shopping-bag mr-5"></i>Add to cart</button>
                                                         
                                         </td>
                                                         </div>
@@ -69,10 +69,15 @@
                                                     </div>
                                                     
 
-                                                </form>
+                                              
                                            
                                         </tr>
-                                        <% }) } %>
+                                        <% }) }else { %>
+                                            <tr>
+                                                <td colspan="6" class="text-center"> &#x1F494;Your wishlist is empty</td>
+                                            </tr>
+                                        <% } %> 
+
                                 </tbody>
                             </table>
 
@@ -120,6 +125,63 @@
                     console.error('Error removing wishlist item:', error);
                 });
         }
+
+
+        function addToCart(productId) {
+  
+
+    const qtyData = document.getElementById('qty').value;
+    const productDataId =  document.getElementById('productData_id').value;
+   
+    const requestData = {
+        qty: qtyData,
+        
+        productData_id: productDataId   
+      };
+
+
+    fetch('/cart', {
+        method: 'POST',
+        headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(requestData),
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json(); // assuming the server returns JSON data
+    })
+    .then(data => {
+        // Assuming you have the product added successfully logic on the server-side
+        var isSuccess = data.success; // replace with your actual server response property
+
+        if (isSuccess) {
+            // Display success message
+            Toastify({
+                text: "Product added to cart successfully",
+                backgroundColor: "green",
+            }).showToast();
+          location.reload();
+        } else {
+            // Display error message
+            Toastify({
+                text: "Error adding product to cart",
+                backgroundColor: "red",
+            }).showToast();
+        }
+    })
+    .catch(error => {
+        console.error('There was a problem with the fetch operation:', error);
+        // Display error message
+        Toastify({
+            text: "Error adding product to cart",
+            backgroundColor: "red",
+        }).showToast();
+    });
+}
+
     </script>
 
     <style>

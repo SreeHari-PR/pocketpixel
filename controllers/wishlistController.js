@@ -8,22 +8,20 @@ const Product=require("../models/productModel")
 const loadWishlist = async(req,res)=>{
     try {
 
-    const userId = req.session.user_id
-    console.log(userId,"jkdhjsd");
+    const userId = req.session.user_id;
     const userData = await User.findById(userId);
-    console.log(userData,'hjkshgjk');
 
     const userWishlist = await Wishlist.findOne({user:userId}).populate("items.product")
-    console.log(userWishlist,'userWishlist');
 
     const userWishlistItems = userWishlist?userWishlist.items:[]
 
     const wishList = await Wishlist.find({user:userId})
     const cartCount = await Cart.find({user:userId})
+    const product=await Product.find({user:userId})
     
     
 
-    res.render("user/wishList",{userData,Wishlist:userWishlistItems,wishList,cartCount})
+    res.render("user/wishList",{userData,Wishlist:userWishlistItems,wishList,cartCount,product})
     
         
     } catch (error) {
@@ -36,18 +34,12 @@ const loadWishlist = async(req,res)=>{
 const addToWishList = async(req,res)=>{
     try {
 
-     console.log("cvvvvvvvvv");
-
         const userId = req.session.user_id
-        console.log(userId);
         const productId = req.body.productId
-        console.log(productId,"hksdhkh");
 
         let userWishlist = await Wishlist.findOne({user:userId})
 
         if(!userWishlist){
-
-            console.log("new list ");
             userWishlist = new Wishlist({
                 user:userId,
                 items:[
@@ -56,10 +48,7 @@ const addToWishList = async(req,res)=>{
             })
             await userWishlist.save()
         }else{
-            console.log("exist wishlist");
             const existingWishlistitem = userWishlist.items.find((item)=>item.product.toString()===productId)
-
-            console.log(existingWishlistitem,"kkkkkkkkkkkk");
 
             if(existingWishlistitem){
                 return res.status(400).json({success:false,error:"the product is alredy wishlist"})

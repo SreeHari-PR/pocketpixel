@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>Admin Dashboard</title>
 
-    <!-- Bootstrap CSS -->
+
     
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 </head>
@@ -35,4 +35,137 @@
 
 </body>
 
+</html> -->
+
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Login</title>
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" integrity="sha384-rDUEr/cRcWqUqZAg8ToK9gy9oBUqDgp96/gg3UpcGyA1AnrB2RZMR6puB2D+X4vM" crossorigin="anonymous">
+
+    <style>
+        body {
+            background: linear-gradient(to bottom, #00416a, #0086c3);
+            font-family: 'Arial', sans-serif;
+        }
+
+        .gradient-custom {
+            background: linear-gradient(45deg, #00416a, #0086c3);
+        }
+
+        .card {
+            border-radius: 1rem;
+        }
+
+        h2 {
+            color: #ffffff;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .text-white-50 {
+            color: #ffffff;
+        }
+
+        .form-outline input.form-control {
+            color: #ffffff;
+        }
+
+        .form-outline label.form-label {
+            color: #ffffff;
+        }
+
+        .btn-outline-light {
+            color: #ffffff;
+            border-color: #ffffff;
+        }
+
+        .btn-outline-light:hover {
+            background-color: #ffffff;
+            color: #00416a;
+        }
+
+        .fab {
+            margin-right: 10px;
+            color: #ffffff;
+        }
+
+        a.text-white-50:hover,
+        a.text-white:hover,
+        a.text-white:active {
+            text-decoration: underline;
+        }
+        .gradient-custom {
+/* fallback for old browsers */
+background: #6a11cb;
+
+/* Chrome 10-25, Safari 5.1-6 */
+background: -webkit-linear-gradient(to right, rgba(106, 17, 203, 1), rgba(37, 117, 252, 1));
+
+/* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+background: linear-gradient(to right, rgba(106, 17, 203, 1), rgba(37, 117, 252, 1))
+}
+    </style>
+</head>
+
+<body>
+
+    <section class="vh-100 gradient-custom">
+        <div class="container py-5 h-100">
+            <div class="row d-flex justify-content-center align-items-center h-100">
+                <div class="col-12 col-md-8 col-lg-6 col-xl-5">
+                    <div class="card bg-dark text-white">
+                        <div class="card-body p-5 text-center">
+
+                            <div class="mb-md-5 mt-md-4 pb-5">
+
+                                <h2 class="fw-bold mb-2 text-uppercase">Admin Login</h2>
+                                <p class="text-white-50 mb-5">Please enter your login and password!</p>
+                                <% if (typeof message !== 'undefined') { %>
+                                    <div class=" login-form alert alert-danger text-center">
+                                        <%= message %>
+                                    </div>
+                                <% } %>
+                                <form action="/admin" method="POST">
+                                <div class="form-outline form-white mb-4">
+                                    <label for="email">Email</label>
+            <input type="email" class="form-control" id="email" name="email" placeholder="Enter Email">
+                                </div>
+
+                                <div class="form-outline form-white mb-4">
+                                    <label for="password">Password</label>
+                                    <input type="password" class="form-control" id="password" name="password" placeholder="Enter Password">
+                                </div>
+
+                                <button class="btn btn-outline-light btn-lg px-5" type="submit">Login</button>
+                                 </form>
+
+                            </div>
+
+                            <div>
+                                <p class="mb-0">USER LOGIN <a href="/" class="text-white-50 fw-bold"> Login Here...</a>
+                                </p>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+</body>
+
 </html>
+
+
+

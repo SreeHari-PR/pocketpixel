@@ -24,7 +24,7 @@ const listUserOrders = async (req, res) => {
       .populate({
         path: "items.product",
         model: "Product",
-      })
+      }).sort({orderDate:-1});
 
     res.render("admin/allOrder", { order:orders });
   } catch (error) {

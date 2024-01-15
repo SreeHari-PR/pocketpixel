@@ -23,7 +23,8 @@ router.get('/logout',islogin,userController.userLogout );
 router.get('/forgotPassword',islogout,userController.laodForgetpassword);
 router.post('/forgotPassword',userController.forgotPasswordOTP);
 router.get('/resetPassword',userController.loadResetPassword);
-router.post('/changePassword',userController.resetPassword);
+
+router.post('/changePassword',userController.changePassword);
 
 
 //user profile
@@ -34,16 +35,19 @@ router.get('/userAddress',islogin,addressController.loadAddress );
 router.get('/addAddress',islogin,addressController.loadAddAddress );
 router.post('/addAddress',islogin,addressController.addAddress );
 router.get('/editAddress',islogin,addressController.loadEditAddress );
-router.post('/editAddress',islogin,addressController.editAddress );
+router.get('/editAddresss',islogin,addressController.loadEditAddresss );
+
+router.put('/editAddress',islogin,addressController.editAddress );
 router.get('/deleteAddress',islogin,addressController.deleteAddress );
 router.post('/resetPassword',islogin,userController.resetPassword);
 
 //shop
 router.get('/shop',islogin,userController.loadShopCategory);
 router.get('/singleProduct/:id',islogin,userController.loadSingleshop);
-router.get('/shopCategoryFilter',islogin,userController.loadShopCategory);
+router.get('/shopCategoryFilter/:id?',islogin,userController.loadShopCategory);
 router.get('/filterProducts',islogin,userController.filterProducts);
-router.get('/sorting',islogin,userController.loadShopCategory);
+router.get('/sorting/:id?',islogin,userController.loadShopCategory);
+router.get('/search', islogin,userController.loadShopCategory);
 
 //cart
  router.get('/cart',islogin,cartController.loadCartPage);
@@ -71,6 +75,10 @@ router.get("/loadWishList",islogin,wishlistController.loadWishlist)
 router.post("/addWishList",islogin,wishlistController.addToWishList)
 router.delete("/removeWishlist",islogin,wishlistController.removeWishlist)
 
+//load about
+
+router.get("/about",islogin,userController.loadAbout );
+router.get("/contact",islogin,userController.loadContact );
 
 
 

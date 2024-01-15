@@ -13,7 +13,6 @@ const loadCouponAdd = async (req, res) => {
   };
   const addCoupon = async (req, res) => {
     try {
-      console.log("fhndgfhjdgfj");
       const admin = req.session.admin_id;
       let {
         coupon_code,
@@ -26,8 +25,6 @@ const loadCouponAdd = async (req, res) => {
       } = req.body;
   
       coupon_code = coupon_code.replace(/\s/g, "");
-  
-      console.log(req.body, "req.body");
   
       const existingCoupon = await Coupon.findOne({
         code: { $regex: new RegExp("^" + coupon_code, "i") },
@@ -46,8 +43,6 @@ const loadCouponAdd = async (req, res) => {
         maxAmt: maxAmt,
         minAmt: minAmt,
       });
-  
-      console.log(newCoupon, "newCoupon");
   
       await newCoupon.save();
       res.status(200).json({ success: true, message: "Coupon added successfully" });
@@ -69,7 +64,6 @@ const loadCouponAdd = async (req, res) => {
         .skip((page - 1) * limit)
         .limit(limit)
         .sort({ createdDate: -1 });
-        console.log(coupon);
       res.render("admin/couponList", { coupon, admin, totalPages, currentPage: page });
     } catch (error) {
       console.log(error.message);

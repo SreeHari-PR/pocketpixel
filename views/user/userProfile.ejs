@@ -36,9 +36,6 @@
                                   <li class="nav-item">
                                     <a class="nav-link"  href="/coupons" ><i class="fi-rs-shopping-bag mr-10"></i>coupon</a>
                                   </li>
-                                  <li class="nav-item">
-                                      <a class="nav-link" id="track-orders-tab" data-bs-toggle="tab" href="#track-orders" role="tab" aria-controls="track-orders" aria-selected="false"><i class="fi-rs-shopping-cart-check mr-10"></i>Track Your Order</a>
-                                  </li>
                              
                               
                                   <li class="nav-item">
@@ -123,6 +120,11 @@
                                               </article>
                                           </div> 
                                           <div class="col-md">
+                                            <article class="box m-3 bg-light d-flex">
+                                              <h5>Referral Code </h5> : <h5>
+                                                <%=userData.referralCode%>
+                                              </h5>
+                                            </article>
                                          
                                           </div> 
                                       </div> 
@@ -149,7 +151,7 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <form id="passwordChangeForm" action="/resetPassword" onsubmit="return validationPasswordChecking()">
+        <form id="passwordChangeForm" action="/changePassword" onsubmit="return validationPasswordChecking()">
           <div class="form-group">
             <input
               type="password"
@@ -311,7 +313,7 @@ document.getElementById("passwordChangeForm").addEventListener("submit", async (
 
   try {
    
-    const response = await fetch('/resetPassword', {
+    const response = await fetch('/changePassword', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

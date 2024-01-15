@@ -181,7 +181,6 @@
 
     <script>
         function validationChecking(offer_name, discount, discountType, discountOn, maxAmt, expiryDate, startDate) {
-            console.log("Expiry Date:", expiryDate);
             const offer_name_error = document.getElementById("offer_name-error");
             const discountType_error = document.getElementById("discountType-error");
             const discount_error = document.getElementById("discount-error");
@@ -226,10 +225,8 @@
             const startDate = document.getElementById("startDate").value;
             const expiryDate = document.getElementById("expiryDate").value;
 
-            console.log(expiryDate, "expiryDate");
+            
             const errors = validationChecking(offer_name, discount, discountType, discountOn, maxAmt, expiryDate, startDate);
-
-            console.log("Validation Errors: ", errors);
 
 
             if (!errors) {
@@ -244,7 +241,6 @@
                     discountedProduct,
                     discountedCategory,
                 };
-                console.log(requestData,"requestData");
 
                 fetch('/admin/offerAdd', {
                     method: 'POST',
@@ -255,7 +251,7 @@
                 })
                 .then(response => response.json())
                 .then(data => {
-console.log(data,"validationChecking");
+
                     if (data.success) {
                         window.location.href = '/admin/offerlist';
                     } else {

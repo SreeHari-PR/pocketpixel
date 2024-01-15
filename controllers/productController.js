@@ -37,7 +37,6 @@ const addProduct = async (req, res) => {
       const imageFiles = req.files;
   
       for (const file of imageFiles) {
-        console.log(file, "File received");
   
         const randomInteger = Math.floor(Math.random() * 20000001);
         const imageDirectory = path.join('public', 'adminassets', 'imgs', 'productIMG');
@@ -85,7 +84,6 @@ const addProduct = async (req, res) => {
 const deleteProduct = async (req, res) => {
   try {
     const id = req.params.id;
-    console.log(id, "kkkkkk");
     const productData = await Products.findByIdAndUpdate(
       { _id: id },
       {
@@ -144,14 +142,11 @@ const storeEditProduct = async (req, res) => {
     }
     if(req.files.length!=0){
       for (const file of req.files) {
-        console.log(file, "File received");
   
         const randomInteger = Math.floor(Math.random() * 20000001);
         const imageDirectory = path.join('public', 'adminassets', 'imgs', 'productIMG');
         const imgFileName = "cropped" + randomInteger + ".jpg";
         const imagePath = path.join(imageDirectory, imgFileName);
-  
-        console.log(imagePath, "Image path");
   
         const croppedImage = await sharp(file.path)
           .resize(580, 320, {

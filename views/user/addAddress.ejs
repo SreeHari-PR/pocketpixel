@@ -54,14 +54,7 @@
                 <section class="content-body p-xl-4">
                   <form action="/addAddress" method="post" onsubmit="return validationChecking()">
                     <div class="row">
-
-
-
-
-
-
-
-                      <div class="form-group">
+                     <div class="form-group">
                         <input type="text" id="houseName" name="houseName" placeholder="Enter Name" />
                         <div id="errorhouseName" class="ms-2 text-danger"></div>
                       </div>
@@ -88,7 +81,7 @@
                     </div>
                     <br>
                     <div class="text-center">
-                      <button class="btn btn-primary " type="submit">Save changes</button>
+                      <button class="btn btn-primary " onclick="submitAddressForm()">Save changes</button>
                     </div>
 
                   </form>
@@ -167,6 +160,34 @@ function validationChecking() {
 
   return isValid;
 }
+
+function submitAddressForm() {
+    // Collect form data
+    var formData = {
+        houseName: document.getElementById('houseName').value,
+        street: document.getElementById('street').value,
+        city: document.getElementById('city').value,
+        state: document.getElementById('state').value,
+        pincode: document.getElementById('pincode').value
+    };
+
+    // Make AJAX request
+    fetch('/addAddress', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+    })
+    .then(response => response.json())
+    .then(data => {
+        window.location.href = '/userAddress';
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        
+    });
+  }
 </script>
 
 

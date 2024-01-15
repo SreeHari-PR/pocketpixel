@@ -62,7 +62,6 @@ const addOffer = async (req, res) => {
           error: "An offer for this product already exists.",
         });
     }
-    console.log("fdfgsjfdsfjhfdgsfdsj");
     const newOffer = new Offer({
       name: offer_name,
       discountOn,
@@ -79,7 +78,6 @@ const addOffer = async (req, res) => {
 
     if (discountedProduct) {
       const discountedProductData = await Product.findById(discountedProduct);
-      console.log(discountedProductData);
 
       let discount = 0;
       if (discountType === "percentage") {
@@ -123,7 +121,6 @@ const addOffer = async (req, res) => {
       const discountedProductData = await Product.find({
         category: categoryData._id,
       });
-      console.log(discountedProductData, "discountedProductData");
       for (const product of discountedProductData) {
         let discount = 0;
         if (discountType === "percentage") {
@@ -224,7 +221,6 @@ const loadOfferEdit = async (req, res) => {
       .populate("discountedCategory");
     const startDate = new Date(offer.startDate).toISOString().split("T")[0];
     const endDate = new Date(offer.endDate).toISOString().split("T")[0];
-    console.log(offer);
     res.render("admin/offerEdit", {
       admin,
       offer,
@@ -255,8 +251,7 @@ const editOffer = async (req, res) => {
       discountedProduct,
       discountedCategory,
     } = req.body;
-
-    console.log(req.body);
+    
     const existingOffer = await Offer.findById(offerId);
 
     if (!existingOffer) {
@@ -355,7 +350,6 @@ const editOffer = async (req, res) => {
       );
     } else if (discountedCategory) {
       const categoryData = await Category.findById(discountedCategory);
-console.log("fghfh");
       await Category.updateOne(
         { _id: discountedCategory },
         {

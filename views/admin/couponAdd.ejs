@@ -98,7 +98,6 @@
 </form>
 <script> 
   function validationChecking(coupon_code, discount, limit, minAmt, maxAmt,expiryDate) {
-    console.log("Expiry Date:", expiryDate);
     const code_error = document.getElementById("code-error");
     const discount_error = document.getElementById("discount-error");
     const limit_error = document.getElementById("limit-error");
@@ -141,8 +140,6 @@ const addCoupon = () => {
     const maxAmt = document.getElementById("maxAmt").value;
     const minAmt = document.getElementById("minAmt").value;
     const expiryDate = document.getElementById("expiryDate").value;
-  
-console.log(expiryDate,"expiryDate");
     const errors = validationChecking(coupon_code, discount, limit, minAmt, maxAmt, expiryDate);
 
     // If there are no errors, proceed with the fetch request
@@ -156,7 +153,6 @@ console.log(expiryDate,"expiryDate");
           
             expiryDate
         };
-console.log(requestData);
         fetch('/admin/couponAdd', {
             method: 'POST',
             headers: {

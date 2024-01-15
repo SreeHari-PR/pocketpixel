@@ -121,7 +121,7 @@
                     <div class="row">
                         <div class=" me-4 mt-5 mb-10">
                         <a href="#">
-                            <button class="btn float-end btn-success btn-sm rounded font-md" data-bs-toggle="modal-title" data-bs-target="addressModal">Add Address</button>
+                            <button class="btn float-end btn-success btn-sm rounded font-md" data-bs-toggle="modal" data-bs-target="#addressModal">Add Address</button>
                         </a>
                         </div>
                         <% addressData?.forEach((address,index)=> {
@@ -175,9 +175,55 @@
 
                                             </div>
                                             <div class="d-flex justify-content-end   mt-50">
-                                                <a href="#" onclick="editAddressModal(<%= JSON.stringify(address) %>)" class="btn-small">Edit</a>
+                                                <a href="#" class="btn-small" data-bs-toggle="modal" data-bs-target="#editModal"  onclick="openEditAddressModal('<%= address._id %>')"   >Edit</a>
 
                                               </div>
+                                              <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+                                                <div class="modal-dialog">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title" id="addressModalLabel">Edit Address</h5>
+                                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            <form id="addressForm"  onsubmit="return validationChecking() "  action="/editAddress">
+                                                                <input type="hidden" id="address_id" name="address_id" value="<%=addressData._id %>">
+                                                                <div class="form-group">
+                                                                    <label for="houseName">House Name:</label>
+                                                                    <input type="text" id="houseName" name="houseName" value="<%=addressData.houseName %>" class="form-control" placeholder="Enter House Name">
+                                                                    <div id="errorhouseName" class="ms-2 text-danger"></div>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label for="street">Street:</label>
+                                                                    <input type="text" id="street" value="<%=addressData.street %>" name="street" class="form-control" placeholder="Enter Street">
+                                                                    <div id="errorstreet" class="ms-2 text-danger"></div>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label for="city">City:</label>
+                                                                    <input type="text" id="city" value="<%=addressData.city %>"  name="city" class="form-control" placeholder="Enter City">
+                                                                    <div id="errorcity" class="ms-2 text-danger"></div>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label for="state">State:</label>
+                                                                    <input type="text" id="state"  value="<%=addressData.state %>" name="state" class="form-control" placeholder="Enter State">
+                                                                    <div id="errorstate" class="ms-2 text-danger"></div>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label for="pincode">Pincode:</label>
+                                                                    <input type="text" id="pincode" value="<%=addressData.pincode %>" name="pincode" class="form-control" placeholder="Enter Pincode">
+                                                                    <div id="errorpincode" class="ms-2 text-danger"></div>
+                                                                </div>
+                                                                
+                                    
+                                                            </form>
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                            <button type="button" class="btn btn-primary" id="saveChangesBtn" onclick="editsubmitData()"  >Save changes</button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
                                             
                                         </div>
 
@@ -194,68 +240,6 @@
 
                             <% }); %>
                     </div>
-
-                    <form action="/addAddress" method="post" onsubmit="return validationChecking()">
-
-
-
-                        <div class="ship_detail">
-                            <div class="form-group">
-                                <div class="chek-form">
-                                    <div class="custome-checkbox">
-                                        <input class="form-check-input" type="checkbox" name="checkbox"
-                                            id="differentaddress">
-                                        <label class="form-check-label label_info" data-bs-toggle="collapse"
-                                            data-target="#collapseAddress" href="#collapseAddress"
-                                            aria-controls="collapseAddress" for="differentaddress"><span>Ship to a
-                                                different address?</span></label>
-                                    </div>
-                                </div>
-                            </div>
-                            <div id="collapseAddress" class="different_address collapse in">
-                                <div class="row">
-
-
-
-
-
-
-
-                                    <div class="form-group">
-                                        <input type="text" id="houseName" name="houseName" placeholder="Enter Name" />
-                                        <div id="errorhouseName" class="ms-2 text-danger"></div>
-                                    </div>
-                                    <div class="form-group ">
-                                        <input type="text" id="street" name="street" placeholder="Enter street" />
-                                        <div id="errorstreet" class="ms-2 text-danger"></div>
-                                    </div>
-                                    <div class="form-group ">
-                                        <input type="text" id="city" name="city" placeholder="Enter city" />
-                                        <div id="errorcity" class="ms-2 text-danger"></div>
-                                    </div>
-
-                                    <div class="row">
-                                        <div class="form-group col-md-6">
-                                            <input type="text" id="state" name="state" placeholder="Enter state" />
-                                            <div id="errorstate" class="ms-2 text-danger"></div>
-                                        </div>
-                                        <div class="form-group col-md-6">
-                                            <input type="text" id="pincode" name="pincode"
-                                                placeholder="Enter pincode" />
-                                            <div id="errorpincode" class="ms-2 text-danger"></div>
-                                        </div>
-                                    </div>
-                                </div>
-
-
-                                <br>
-                                <div class="text-center">
-                                    <button class="btn btn-primary " type="submit">Save changes</button>
-                                </div>
-                            </div>
-                        </div>
-
-                    </form>
                 </div>
                 <div class="col-md-6">
                     <div class="order_review">
@@ -360,7 +344,7 @@
             </div>
             </div>
         </section>
-
+<!-- addAddress -->
         <div class="modal fade" id="addressModal" tabindex="-1" aria-labelledby="addressModalLabel" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
@@ -369,31 +353,31 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <form id="addressForm" method="post" onsubmit="submitAddressForm(event)" action="/addAddress">
+                        <form id="addressForm" method="post" onsubmit="return validation() "  action="/addAddress">
                             <div class="form-group">
                                 <label for="houseName">House Name:</label>
-                                <input type="text" id="houseName" name="houseName" class="form-control" placeholder="Enter House Name">
-                                <div id="errorhouseName" class="ms-2 text-danger"></div>
+                                <input type="text" id="houseNameS" name="houseName" class="form-control" placeholder="Enter House Name">
+                                <div id="errorhouseNameS" class="ms-2 text-danger"></div>
                             </div>
                             <div class="form-group">
                                 <label for="street">Street:</label>
-                                <input type="text" id="street" name="street" class="form-control" placeholder="Enter Street">
-                                <div id="errorstreet" class="ms-2 text-danger"></div>
+                                <input type="text" id="streetS" name="street" class="form-control" placeholder="Enter Street">
+                                <div id="errorstreetS" class="ms-2 text-danger"></div>
                             </div>
                             <div class="form-group">
                                 <label for="city">City:</label>
-                                <input type="text" id="city" name="city" class="form-control" placeholder="Enter City">
-                                <div id="errorcity" class="ms-2 text-danger"></div>
+                                <input type="text" id="cityS" name="city" class="form-control" placeholder="Enter City">
+                                <div id="errorcityS" class="ms-2 text-danger"></div>
                             </div>
                             <div class="form-group">
                                 <label for="state">State:</label>
-                                <input type="text" id="state" name="state" class="form-control" placeholder="Enter State">
-                                <div id="errorstate" class="ms-2 text-danger"></div>
+                                <input type="text" id="stateS" name="state" class="form-control" placeholder="Enter State">
+                                <div id="errorstateS" class="ms-2 text-danger"></div>
                             </div>
                             <div class="form-group">
                                 <label for="pincode">Pincode:</label>
-                                <input type="text" id="pincode" name="pincode" class="form-control" placeholder="Enter Pincode">
-                                <div id="errorpincode" class="ms-2 text-danger"></div>
+                                <input type="text" id="pincodeS" name="pincode" class="form-control" placeholder="Enter Pincode">
+                                <div id="errorpincodeS" class="ms-2 text-danger"></div>
                             </div>
                             
 
@@ -401,11 +385,15 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="button" class="btn btn-primary"  onclick="submitAddressForm()" >Save changes</button>
+                        <button type="button" class="btn btn-primary" id="saveChangesBtn" onclick="submitAddressForm()"  >Save changes</button>
                     </div>
                 </div>
             </div>
         </div>
+  
+
+
+       
     </main>
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
     <script>
@@ -690,7 +678,7 @@
 
 
 
-            < script >
+          
             // Add event listener to copy coupon code
             document.querySelectorAll('.copy-coupon-btn').forEach(function (button) {
                 button.addEventListener('click', function () {
@@ -787,88 +775,171 @@
 
             return isValid;
         }
-
-   
-    </script>
-    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
-
-//     <script>
-//     function openAddressModal() {
-//         // Clear existing form data if any
-//         document.getElementById("addressForm").reset();
-//         // Reset validation errors
-//         resetValidationErrors();
-//         // Open the modal
-//         $('#addressModal').modal('show');
-//     }
-
-//     function editAddressModal(addressData) {
-//         // Parse the JSON string to get the address object
-//         const address = JSON.parse(addressData);
-
-//         // Fill the form fields with existing address data
-//         document.getElementById("houseName").value = address.houseName;
-//         document.getElementById("street").value = address.street;
-//         document.getElementById("city").value = address.city;
-//         document.getElementById("state").value = address.state;
-//         document.getElementById("pincode").value = address.pincode;
-
-//         // Reset validation errors
-//         resetValidationErrors();
         
-//         // Open the modal
-//         $('#addressModal').modal('show');
-//     }
+        function submitAddressForm() {
+    // Collect form data
+    var formData = {
+        houseName: document.getElementById('houseNameS').value,
+        street: document.getElementById('streetS').value,
+        city: document.getElementById('cityS').value,
+        state: document.getElementById('stateS').value,
+        pincode: document.getElementById('pincodeS').value
+    };
+console.log(formData,"formData");
 
-//     function submitAddressForm() {
-//         // Reset validation errors
-//         resetValidationErrors();
+    fetch('/addAddress', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log(data);
 
-//         // Validate form fields
-//         const isValid = validateForm();
+       
+        var modal = new bootstrap.Modal(document.getElementById('addressModal'));
+        modal.hide();
 
-//         if (isValid) {
-//             // Submit the form
-//             document.getElementById("addressForm").submit();
-//         }
-//     }
+        // You may want to fetch and display the updated address list on the same page
+        window.location.href = '/checkout';
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        // Handle errors or show error message
+    });
+}
 
-//     function validateForm() {
-//         let isValid = true;
+    function editsubmitData() {
+    var formData = {
+        address_id: document.getElementById('address_id').value,
+        houseName: document.getElementById('houseName').value,
+        street: document.getElementById('street').value,
+        city: document.getElementById('city').value,
+        state: document.getElementById('state').value,
+        pincode: document.getElementById('pincode').value
+    };
 
-//         // Example validation logic, you can customize this based on your requirements
-//         isValid = validateField("houseName") && isValid;
-//         isValid = validateField("street") && isValid;
-//         isValid = validateField("city") && isValid;
-//         isValid = validateField("state") && isValid;
-//         isValid = validateField("pincode") && isValid;
+    console.log(formData); // Log the entire object
 
-//         return isValid;
-//     }
+    fetch('/editAddress', {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            window.location.href = '/checkout';
+        }
+        console.log(data);
+    })
+    .catch(error => {
+        // Handle any errors that occur during the fetch
+        console.error('Error:', error);
+    });
+}
 
-//     function validateField(fieldName) {
-//         const fieldValue = document.getElementById(fieldName).value;
-//         const errorElement = document.getElementById(`error${fieldName}`);
+    </script>
+<script>
+    async function loadEditAddress(id) {
+    try {
+        const response = await fetch(`/editAddresss?id=${id}`);
+        const data = await response.json();
 
-//         if (fieldValue.trim() === "") {
-//             // Display error message if the field is empty
-//             errorElement.textContent = `${fieldName} is required`;
-//             return false;
-//         }
+        if (data.success) {
+            const address = data.address;
+            document.getElementById('address_id').value = address._id;
+            document.getElementById('houseName').value = address.houseName;
+            document.getElementById('street').value = address.street;
+            document.getElementById('city').value = address.city;
+            document.getElementById('state').value = address.state;
+            document.getElementById('pincode').value = address.pincode;
 
-//         // Additional validation logic can be added here
+            // Open the modal
 
-//         return true;
-//     }
+        } else {
+            console.error('Failed to load address data');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+    }
+}
 
-//     function resetValidationErrors() {
-//         // Reset all error messages
-//         const errorElements = document.querySelectorAll("[id^=error]");
-//         errorElements.forEach((element) => {
-//             element.textContent = "";
-//         });
-//     }
-// </script>
+// Call this function when you want to load and show the modal with the address data
+// For example, you can call it with an onclick event on an "Edit" button
+function openEditAddressModal(id) {
+    loadEditAddress(id);
+}
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+            const houseNameS = document.getElementById("houseNameS");
+            const errorhouseNameS = document.getElementById("errorhouseName");
+            const streetS = document.getElementById("streetS");
+            const errorstreetS = document.getElementById("errorstreetS");
+            const cityS = document.getElementById("cityS");
+            const errorcityS = document.getElementById("errorcityS");
+            const stateS = document.getElementById("stateS");
+            const errorstateS = document.getElementById("errorstateS");
+            const pincodeS = document.getElementById("pincodeS");
+            const errorpincodeS = document.getElementById("errorpincodeS");
+
+            houseNameS.addEventListener('input', function () {
+                errorhouseNameS.innerHTML = houseNameS.value.trim() === "" ? "Please enter home name" : /^[a-zA-Z ]+$/.test(houseNameS.value) == false ? "Please enter alphabets only" : "";
+            });
+            streetS.addEventListener('input', function () {
+                errorstreetS.innerHTML = streetS.value.trim() === "" ? "Please enter street name" : /^[a-zA-Z ]+$/.test(streetS.value) == false ? "Please enter alphabets only" : "";
+            });
+            cityS.addEventListener('input', function () {
+                errorcityS.innerHTML = cityS.value.trim() === "" ? "Please enter city name" : /^[a-zA-Z ]+$/.test(cityS.value) == false ? "Please enter alphabets only" : "";
+            });
+            stateS.addEventListener('input', function () {
+                errorstateS.innerHTML = stateS.value.trim() === "" ? "Please enter state name" : /^[a-zA-Z ]+$/.test(stateS.value) == false ? "Please enter alphabets only" : "";
+            });
+
+            pincodeS.addEventListener('input', function () {
+                errorpincodeS.innerHTML = pincodeS.value.trim() === "" ? "Please enter  number" : /^\d{6}$/.test(pincodeS.value) == false ? "Please enter valid  number" : "";
+            });
+
+
+        });
+        function validation() {
+            const houseNameS = document.getElementById("houseName");
+            const errorhouseNameS = document.getElementById("errorhouseNameS");
+            const streetS = document.getElementById("streetS");
+            const errorstreetS = document.getElementById("errorstreetS");
+            const cityS = document.getElementById("cityS");
+            const errorcityS = document.getElementById("errorcityS");
+            const stateS = document.getElementById("stateS");
+            const errorstateS = document.getElementById("errorstateS");
+            const pincodeS = document.getElementById("pincodeS");
+            const errorpincodeS = document.getElementById("errorpincodeS");
+
+            let isValid = true;
+
+            errorhouseNameS.innerHTML = houseNameS.value.trim() === "" ? "Please enter home name" : /^[a-zA-Z ]+$/.test(houseNameS.value) == false ? "Please enter alphabets only" : "";
+            errorstreetS.innerHTML = streetS.value.trim() === "" ? "Please enter street name" : /^[a-zA-Z ]+$/.test(streetS.value) == false ? "Please enter alphabets only" : "";
+            errorcityS.innerHTML = cityS.value.trim() === "" ? "Please enter city name" : /^[a-zA-Z ]+$/.test(cityS.value) == false ? "Please enter alphabets only" : "";
+            errorstateS.innerHTML = stateS.value.trim() === "" ? "Please enter state name" : /^[a-zA-Z ]+$/.test(stateS.value) == false ? "Please enter alphabets only" : "";
+            errorpincodeS.innerHTML = pincodeS.value.trim() === "" ? "Please enter pincode" : /^\d{6}$/.test(pincodeS.value) == false ? "Please enter valid pincode" : "";
+
+            if (
+                errorhouseNameS.innerHTML ||
+                errorstreetS.innerHTML ||
+                errorcityS.innerHTML ||
+                errorstateS.innerHTML ||
+                errorpincodeS.innerHTML
+            ) {
+                isValid = false;
+            }
+
+            return isValid;
+        }
+</script>
 
    
 

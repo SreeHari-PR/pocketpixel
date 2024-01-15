@@ -29,6 +29,10 @@ const Product = new mongoose.Schema({
     type:Number, 
     required:true
   },
+  discountPrice: {
+    type: Number,
+  
+  },
   storage:{
     type:String,
     required:true
@@ -49,7 +53,15 @@ const Product = new mongoose.Schema({
   is_listed:{
     type:Boolean,
     default:true
-}
+},
+ 
+discountStatus:{
+  type:Boolean,
+  default:false
+},
+discount:Number,
+discountStart:Date,
+discountEnd:Date,
  
 
   

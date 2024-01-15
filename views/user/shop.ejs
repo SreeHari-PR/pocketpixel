@@ -10,12 +10,16 @@
           <div class="widget-category mb-30 mt-60">
             <h5 class="section-title style-1 mb-30 wow fadeIn animated">Category</h5>
             <ul class="categories">
-              <li><a href="/shop"><option value="">All</option></a></li>
+              <li><a href="/shop" data-category-id="">All</a></li>
               <% categories.forEach(category=> { if (category.is_listed) { %>
               <li>
-                <a href="shopCategoryFilter?id=<%= category._id %>" >
+                <a class="<%= categoryId === category._id.toString() ? 'active' : '' %>"
+                  href="/shop<%= category._id === categoryId ? '' : `?categoryId=${category._id}` %>&sort=<%= sort %>">
+
+                  
                   <option value="<%= category._id %>"><%= category.name %></option>
-                </a>
+               </a>
+               
               </li>
               <% } }); %>
             </ul>
@@ -23,10 +27,16 @@
           <!-- Sorting Section -->
           <div class="widget-category mb-30">
             <h5 class="section-title style-1 mb-30 wow fadeIn animated">Sorting by price:</h5>
-            <ul>
-              <li><a class="active" href="/shop">Featured</a></li>
-              <li><a href="/shop?sort=asc">Price: Low to High</a></li>
-              <li><a href="/shop?sort=dsc">Price: High to Low</a></li>
+            <ul class="sorting">
+              <li><a  href="/shop">Featured</a></li>
+              <li><a class="<%= sort === 'asc' ? 'active' : '' %>"
+                href="/shop<%= categoryId ? `?categoryId=${categoryId}&` : '?' %>sort=asc">
+                Price: Low to High</a></li>
+                <li>
+                  <a class="<%= sort === 'desc' ? 'active' : '' %>"
+                    href="/shop<%= categoryId ? `?categoryId=${categoryId}&` : '?' %>sort=desc">
+                    Price: High to Low</a>
+              </li>
             </ul>
           </div>
         </div>
@@ -70,8 +80,11 @@
                         <!-- Product Details -->
                         <div class="product-content-wrap">
                           <div class="product-category">
-                            <a href="shopCategoryFilter?id=<%= category._id %>">
-                              <option value="<%= category._id %>"><%= category.name %></option>
+                            <!-- Assuming category._id is the category ID -->
+             <a href="/shopCategoryFilter/<%= category._id %>?sort=<%= sort %>"> 
+              <%= category.name %></a>
+<!-- 
+                              <option value="<%= category._id %>"><%= category.name %></option> -->
                             </a>
                           </div>
                           <h2><a href="/singleProduct/<%= product._id%>"><%= product.name %></a></h2>
@@ -79,22 +92,23 @@
                           <div class="rating-result" title="90%">
                             <span>
                               <%if(product.discountStatus==true &&new Date() <= new Date(product.discountEnd)  ){%>
-                                                            <% const percentageOff = ((product.price - product.discount_price) / product.price) * 100; %>
+                                                            <% const percentageOff = ((product.price - product.discountPrice) / product.price) * 100; %>
                                                             <span style="font-size: 16px; background-color: rgb(255, 255, 255); border-radius: 2px; padding: 5px 10px 5px 10px;" class="old-price ml-3 text-success">- <%= percentageOff.toFixed(2) %>% OFF</span>
                                                         <%}%>
                            
                             </span>
                           </div>
                           <div class="product-price">
-                            <% if (product.discount_price) { %>
-                            <span>₹<%= product.discount_price %> </span>
-                            <span class="old-price">- ₹<s><%= product.price %></s></span>
-                            <% } else { %>
-                            <span class="old-price"> ₹<%= product.price %></span>
-                            <% } %>
-                          </div>
+                <% if (product.discountStatus && new Date() <= new Date(product.discountEnd) ) { %>
+                  <span>₹<%= product.discountPrice %> </span>
+                  <span class="old-price">- ₹<s><%= product.price %></s></span>
+                <% } else { %>
+                  <span> ₹<%= product.price %></span>
+                <% } %>
+              </div>
+                  
                           <!-- Add the form for adding to cart if needed -->
-                          <!-- <form id="myForm" >
+                          <form id="myForm" >
                             <div class="product-action-1 show">
                               <input type="hidden" value="<%= product._id %>" name="productData_id">
                               <input type="hidden" value="1" name="qty">
@@ -102,7 +116,7 @@
                                 <i class="fi-rs-shopping-bag-add"></i>
                               </button>
                             </div>
-                          </form> -->
+                          </form>
                         </div>
                       </div>
                     </div>
@@ -119,8 +133,9 @@
             <ul class="pagination justify-content-start mb-30">
               <% for (let i = 1; i <= totalPages; i++) { %>
                 <li class="page-item <%= currentPage === i ? 'active' : '' %>">
-                  <a class="page-link" href="/shop?page=<%= i %>"><%= i %></a>
-                </li>
+                  <a class="page-link"  href="/shop?page=<%= i %><%= categoryId ? `&categoryId=${categoryId}` : '' %><%= sort ? `&sort=${sort}` : '' %>"><%= i %>
+                  </a>
+              </li>
               <% } %>
             </ul>
           </nav>
@@ -153,7 +168,12 @@
 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
 
-  <script>
+   <script>
+
+
+
+
+
 document.addEventListener("DOMContentLoaded", function () {
     const searchInput = document.getElementById("searchInput");
     const productGrid = document.getElementById("Grid");
@@ -173,22 +193,93 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 });
+
 document.addEventListener("DOMContentLoaded", function () {
-    const productGrid = document.getElementById("Grid");
+    const productGrid = document.getElementById("productGrid");
+
+    // Event listener for pagination links
     productGrid.addEventListener("click", function (event) {
         if (event.target.tagName === "A") {
             event.preventDefault();
+
+            // Extract the page number from the href attribute
             const page = event.target.getAttribute("href").split("=")[1];
-            fetch(`/shop?page=${page}`)
+
+            // Extract the current filtering and sorting parameters from the current URL
+            const currentURL = window.location.href;
+            const categoryMatch = currentURL.match(/categoryId=([^&]*)/);
+            const sortMatch = currentURL.match(/sort=([^&]*)/);
+
+            const categoryParam = categoryMatch ? `&categoryId=${categoryMatch[1]}` : '';
+            const sortParam = sortMatch ? `&sort=${sortMatch[1]}` : '';
+
+            // Fetch products for the selected page using AJAX with current filter and sort parameters
+            fetch(`/shop?page=${page}${categoryParam}${sortParam}`)
                 .then(response => response.json())
                 .then(data => {
-                  
+                    // Update the product grid with the new products
                     productGrid.innerHTML = data.productsHTML;
                 })
                 .catch(error => console.error("Error:", error));
         }
     });
 });
+
+function addToCart(productId) {
+  const form = document.getElementById('myForm');
+  const formData = new FormData(form);
+
+  // Append the product ID to the form data
+  formData.append('productData_id', productId);
+
+  fetch('/cart', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(Object.fromEntries(formData.entries())),
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+      Toastify({
+        text: 'Product added to cart successfully',
+        duration: 3000,
+        gravity: 'bottom',
+        position: 'right',
+        backgroundColor: '#28a745',
+      }).showToast();
+      setTimeout(() => {
+        window.location.href = '/shop';
+      }, 1000);
+    } else {
+      Toastify({
+        text: 'Error occurred while adding to cart',
+        duration: 3000,
+        gravity: 'bottom',
+        position: 'right',
+        backgroundColor: '#dc3545',
+      }).showToast();
+    
+    }
+  })
+  .catch(error => {
+    console.error('Error:', error);
+    alert('Error occurred while placing order');
+  });
+}
+
+
+
+
+
+
+
+ 
+
+
+
+
 
 
 
