@@ -39,7 +39,6 @@ referralCode: {
 },
 userReferred: [{
   type: String,
-  unique: true,
 }]
 });
 function RandomReferralCode() {
